@@ -1,0 +1,29 @@
+.krinkle-mwSnapshots-repos {
+	width: 100%;
+}
+
+.krinkle-mwSnapshots-repos td.krinkle-mwSnapshots-repo-logo {
+	width: 150px;
+	border-right: none;
+}
+
+.krinkle-mwSnapshots-repos td.krinkle-mwSnapshots-repo-title {
+	border-left: none;
+}
+
+.krinkle-mwSnapshots-selection {
+	text-align: center;
+}
+
+.krinkle-mwSnapshots-select-submit {
+	margin-top: 2em;
+}
+
+.krinkle-mwSnapshots-select-submit input[type="submit"] {
+	padding: 7px 10px;
+	font-size: larger;
+}
+
+.krinkle-mwSnapshots-download {
+	margin-top: 2em;
+}
