@@ -37,9 +37,6 @@ if ( !$kgTool->hasValidRepoDir() ) {
 	exit;
 }
 
-// Browser to the repository dir
-chdir( $kgTool->getSetting( 'mediawikiCoreRepoDir' ) );
-
 // Prepare cache
 if ( !$kgTool->prepareCache() ) {
 	print "Fatal: Cannot write to cache dir.\n";
@@ -51,6 +48,9 @@ if ( !file_exists( $archiveDir ) && !mkdir( $archiveDir, 0755 ) && !is_writable(
 	print "Fatal: Can't write to snapshots directory: $archiveDir\n";
 	exit;
 }
+
+// Browser to the repository dir
+chdir( $kgTool->getSetting( 'mediawikiCoreRepoDir' ) );
 
 /**
  * Removes any trailing and leading whitespace (even multiple lines).
@@ -68,7 +68,7 @@ function kfMwSnapUtil_archiveNameSnippetFilter( $input ) {
 }
 
 print "Pull updates from remote...\n";
-kfShellExec( "git checkout master; git pull --all --force; git reset --hard HEAD" );
+kfShellExec( "git checkout master; git reset --hard HEAD; git pull --all --force" );
 
 // Get remotes (in order to check if there are multiple (which we don't support),
 // and so that we can use this name to substract it from the remote branche names.
@@ -105,7 +105,7 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	print "Normalized: {$branchName}\n";
 
 	print "* Checking out...\n";
-	$execOut = kfShellExec( 'git co ' . kfEscapeShellArg( $remoteBranchName ) );
+	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) );
 
 	print "* Getting SHA1... \n";
 	$headSha1 = trim( kfShellExec( "git rev-parse --verify HEAD" ) );
