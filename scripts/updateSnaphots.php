@@ -133,6 +133,7 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	print "\nBranch: {$remoteBranchName}\n";
 	if ( !kfMwSnapUtil_isGoodBranch( $remoteBranchName ) ) {
 		print "..skipping, not a good branch.\n";
+		continue;
 	}
 	// "gerrit/foobar" or "origin/foobar" -> "foobar"
 	$branchName = preg_replace( '/^(' . preg_quote( $remoteRepository . '/', '/' ) . ')/', '', $remoteBranchName );
@@ -233,6 +234,10 @@ if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
 		}
 	}
 }
+
+// Clean up afterwards as well,
+// leaving behind a fresh master
+kfMwSnapUtil_gitCleanAndReset();
 
 print "
 --
