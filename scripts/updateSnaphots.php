@@ -165,7 +165,8 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	} else {
 		print "* Generating new archive...\n";
 		$archiveFilePathEscaped = kfEscapeShellArg( $archiveFilePath );
-		$execOut = kfShellExec( "git archive HEAD --format='tar.gz' --output={$archiveFilePathEscaped}" );
+		// Toolserver's git doesn't support --format='tar.gz', using 'tar' and piping to gzip instead
+		$execOut = kfShellExec( "git archive HEAD --format='tar' | gzip > {$archiveFilePathEscaped}" );
 	}
 	if ( file_exists( $archiveFilePath ) ) {
 		print "  Done!\n";
