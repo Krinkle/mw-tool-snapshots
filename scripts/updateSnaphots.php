@@ -62,13 +62,44 @@ function kfMwSnapUtil_trimSplitCleanLines( $input ) {
 	return array_map( 'trim', explode( "\n", trim( $input ) ) );
 }
 
+function kfMwSnapUtil_isGoodBranch( $input ) {
+	// Skip stuff like "HEAD -> origin/master"
+	return strpos( $input, '->' ) === false;
+}
+
 /** @return string: filtered string */
 function kfMwSnapUtil_archiveNameSnippetFilter( $input ) {
 	return str_replace( array( '/', '\\', '-', '.', ' ' ), '_', $input );
 }
 
+function kfMwSnapUtil_gitCleanAndReset() {
+	// When checking out a whole bunch of remote branches, creating
+	// archives, moving stuff around. The working copy sometimes leaves
+	// files behind from old mediawiki versions that fall under gitignore
+	// and other crap. Beware that if you run this locally, dont use your
+	// main "dev wiki" repo dir for this, because it'll nuke stuff like
+	// LocalSettings.php away as well.
+	print "Brute force clean up and reset...\n";
+	foreach( array(
+		"git clean -d -x --force;",
+		"git reset --hard HEAD;",
+		"git checkout master;",
+	) as $cmd ) {
+		print "* $cmd\n";
+		kfShellExec( $cmd );
+	}
+	print "\n";
+}
+
+/**
+ * Update
+ * -------------------------------------------------
+ */
+
+kfMwSnapUtil_gitCleanAndReset();
+
 print "Pull updates from remote...\n";
-kfShellExec( "git checkout master; git reset --hard HEAD; git pull --all --force" );
+kfShellExec( "git pull --all --force" );
 
 // Get remotes (in order to check if there are multiple (which we don't support),
 // and so that we can use this name to substract it from the remote branche names.
@@ -100,6 +131,9 @@ print "Remote branches: \n\t" . implode( "\n\t", $remoteBranchNames ) . "\n";
  */
 foreach ( $remoteBranchNames as $remoteBranchName ) {
 	print "\nBranch: {$remoteBranchName}\n";
+	if ( !kfMwSnapUtil_isGoodBranch( $remoteBranchName ) ) {
+		print "..skipping, not a good branch.\n";
+	}
 	// "gerrit/foobar" or "origin/foobar" -> "foobar"
 	$branchName = preg_replace( '/^(' . preg_quote( $remoteRepository . '/', '/' ) . ')/', '', $remoteBranchName );
 	print "Normalized: {$branchName}\n";

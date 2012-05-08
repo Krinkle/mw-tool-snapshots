@@ -3,7 +3,7 @@ ts-krinkle-mwSnapshots
 
 ## Install:
 * Create cache directory (chmod 755)
-* Create local.php (must )
+* Create local.php
 * Run updateSnaphots.php
 * Symlink ./cache/snapshots to ./public_html/snapshots
 * Schedule updateSnaphots.php to run bi-hourly<br>
