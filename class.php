@@ -64,6 +64,34 @@ class KrMwSnapshots extends KrToolBaseClass {
 		return $put !== false;
 	}
 
+	/**
+	 * @param int $targetTime: Unix timestamp
+	 * @param int $originTime: [optional] Unix timestamp (defaults to now)
+	 * @return string: relative time ago, between "just now" and x hours.
+	 */
+	public function dumpTimeAgo( $targetTime, $originTime = null ) {
+		$originTime = $originTime === null ? time() : (int)$originTime;
+
+		// Using round() with PHP_ROUND_HALF_UP so that 61 minutes ago
+		// isn't shown as "2 hours ago".
+
+		$diff = $originTime - $targetTime;
+		$text = '';
+		if ( $diff < 0 ) {
+			$text = 'in the future';
+		} elseif ( $diff < 60 ) {
+			$text = 'just now';
+		} elseif ( $diff < 3600 ) {
+			$i = round( $diff / 60, 0, PHP_ROUND_HALF_DOWN );
+			$text = $i > 1 ? "$i minutes ago" : "1 minute ago";
+		} else {
+			$i = round( $diff / 3600, 0, PHP_ROUND_HALF_DOWN );
+			$text = $i > 1 ? "$i hours ago" : "1 hour ago";
+		}
+
+		return $text;
+	}
+
 	public function prepareCache() {
 		if ( !is_writable( $this->settings['cacheDir'] ) ) {
 			return false;

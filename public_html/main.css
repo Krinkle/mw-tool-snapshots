@@ -11,17 +11,22 @@
 	border-left: none;
 }
 
-.krinkle-mwSnapshots-selection {
+.krinkle-mwSnapshots-repo-select {
 	text-align: center;
 }
 
-.krinkle-mwSnapshots-select-submit {
-	margin-top: 2em;
+.krinkle-mwSnapshots-repo-select-submit {
+	margin: 2em 0;
 }
 
-.krinkle-mwSnapshots-select-submit input[type="submit"] {
+.krinkle-mwSnapshots-repo-select-submit input[type="submit"] {
 	padding: 7px 10px;
 	font-size: larger;
+}
+
+.krinkle-mwSnapshots-repo-dumpdate {
+	font-size: smaller;
+	text-align: right;
 }
 
 .krinkle-mwSnapshots-download {

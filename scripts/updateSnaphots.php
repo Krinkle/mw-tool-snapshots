@@ -235,6 +235,8 @@ if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
 	}
 }
 
+print "\n";
+
 // Clean up afterwards as well,
 // leaving behind a fresh master
 kfMwSnapUtil_gitCleanAndReset();

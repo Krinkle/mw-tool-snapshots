@@ -207,7 +207,7 @@ if ( !$snapshotInfo ) {
 					)
 					. '</li>'
 				. '</ul>'
-			. '</td><td class="krinkle-mwSnapshots-selection">'
+			. '</td><td class="krinkle-mwSnapshots-repo-select">'
 				. $formBase
 				. Html::element( 'input', array(
 					'type' => 'hidden',
@@ -221,14 +221,22 @@ if ( !$snapshotInfo ) {
 				)
 				. '&nbsp;'
 				. $branchesSelect
-				. '<div class="krinkle-mwSnapshots-select-submit">'
+				. '<div class="krinkle-mwSnapshots-repo-select-submit">'
 				. Html::element( 'input', array(
 					'type' => 'submit',
 					'nof' => true,
 					'name' => 'doGetSnapshot',
 					'value' => $I18N->msg( 'branches-submit-button' )
 				))
-				. '</div></form>'
+				. '</div>'
+				. '</form>'
+				. '<p class="krinkle-mwSnapshots-repo-dumpdate">Last dump: '
+					. Html::element( 'time', array(
+						'pubdate' => true,
+						'datetime' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
+						'title' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
+					), $kgTool->dumpTimeAgo( $data['_updateEnd'] ) )
+				. '</p>'
 			. '</td>'
 			. '</tr>';
 
