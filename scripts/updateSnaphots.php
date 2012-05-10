@@ -162,18 +162,18 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	$archiveFilePath = "$archiveDir/$archiveFileName";
 	print "* Preparing archive: $archiveFilePath \n";
 	if ( file_exists( $archiveFilePath ) ) {
-		print "  Archive already exists.\n";
+		print "  An archive for this version already exists, no update needed.\n";
 	} else {
-		print "* Generating new archive...\n";
+		print "* Existing archive is outdated, generating new archive...\n";
 		$archiveFilePathEscaped = kfEscapeShellArg( $archiveFilePath );
 		// Toolserver's git doesn't support --format='tar.gz', using 'tar' and piping to gzip instead
 		$execOut = kfShellExec( "git archive HEAD --format='tar' | gzip > {$archiveFilePathEscaped}" );
-	}
-	if ( file_exists( $archiveFilePath ) ) {
-		print "  Done!\n";
-	} else {
-		$archiveFilePath =  false;
-		print "  FAILED!\n";
+		if ( file_exists( $archiveFilePath ) ) {
+			print "  Done!\n";
+		} else {
+			$archiveFilePath =  false;
+			print "  FAILED!\n";
+		}
 	}
 
 	$snapshotInfo['mediawiki-core']['branches'][$branchName] = array(
@@ -214,24 +214,26 @@ if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
 	$oldBranchInfos = $oldSnapshotInfo['mediawiki-core']['branches'];
 	$newBranchInfos = $snapshotInfo['mediawiki-core']['branches'];
 	foreach ( $oldBranchInfos as $branch => $oldBranchInfo ) {
+		print "* $branch:\n\t";
 		if ( !isset( $newBranchInfos[$branch] ) || $newBranchInfos[$branch]['snapshot'] == false ) {
-			print "* $branch: NOTICE. New index does not have this branch. Leaving old snapshot {$oldBranchInfo['snapshot']['path']}\n";
+			print "NOTICE. New index does not have this branch. Leaving old snapshot {$oldBranchInfo['snapshot']['path']}";
 		} else {
 			if ( $oldBranchInfo['snapshot'] == false || $oldBranchInfo['snapshot']['path'] === $newBranchInfos[$branch]['snapshot']['path'] ) {
-				print "* $branch: OK. No old snapshots found.\n";
+				print "OK. Previous version is the same.";
 			} else {
 				if ( !file_exists( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] ) ) {
-					print "* $branch: NOTICE. Old snapshot already deleted.\n";
+					print "WARNING. Previous snapshot already deleted.";
 				} else {
 					$del = unlink( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] );
 					if ( $del === false ) {
-						print "* $branch: FAILED! Could not remove old snapshot at {$oldBranchInfo['snapshot']['path']}\n";
+						print "ERROR! Could not remove old snapshot at {$oldBranchInfo['snapshot']['path']}";
 					} else {
-						print "* $branch: OK. Removed old snapshot at {$oldBranchInfo['snapshot']['path']}\n";
+						print "UPDATED. Removed previous snapshot at {$oldBranchInfo['snapshot']['path']}";
 					}
 				}
 			}
 		}
+		print "\n";
 	}
 }
 

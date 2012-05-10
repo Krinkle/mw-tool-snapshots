@@ -41,10 +41,35 @@ if ( !$snapshotInfo ) {
 	$pageHtml = kfMsgBlock( $I18N->msg( 'err-snapshotindex' ), 'warning error' );
 
 /**
+ * Output (show update log)
+ * -------------------------------------------------
+ */
+} elseif ( $kgReq->getVal( 'action' ) === 'updatelog' ) {
+
+	$kgBaseTool->addOut( $I18N->msg( 'title-updatelog' ), 'h2' );
+	$pageHtml .= Html::element( 'p', array(), $I18N->msg( 'updatelog-intro' ) );
+
+	if ( !$kgTool->getUpdateLogFilePath() ) {
+		// Error: No update log
+		$pageHtml .= kfMsgBlock( $I18N->msg( 'err-noupdatelog' ), 'warning' );
+	} else {
+		$notice = $kgTool->isUpdateLogActive()
+			 ? kfMsgBlock( $I18N->msg( 'updatelog-active' ), 'warning' )
+			 : '';
+
+		$pageHtml .= '<hr/>'
+			. $notice
+			. Html::element( 'pre', array(),
+				$kgTool->getUpdateLogContent()
+			)
+			. $notice;
+	}
+
+/**
  * Output (get snapshot)
  * -------------------------------------------------
  */
-} elseif ( $kgReq->wasPosted() && $kgReq->getBool( 'doGetSnapshot' ) ) {
+} elseif ( $kgReq->wasPosted() && $kgReq->getVal( 'action' ) === 'getSnapshot' ) {
 
 	$repoName = $kgReq->getVal( 'repoName' );
 	$branch = $kgReq->getVal( 'branch' );
@@ -123,7 +148,13 @@ if ( !$snapshotInfo ) {
 					. htmlspecialchars( $I18N->msg( 'tablehead-filesize' ) )
 					. '</th><td>'
 						. kfFormatBytes( $branchInfo['snapshot']['byteSize'] )
-						. ' (' . $branchInfo['snapshot']['byteSize'] . ' bytes)'
+						. ' '
+						. $I18N->msg( 'parentheses', array(
+							'domain' => 'general',
+							'variables' => array(
+								$branchInfo['snapshot']['byteSize'] . ' bytes'
+							)
+						))
 					. '</td></tr>'
 					. '<tr><th>'
 					. htmlspecialchars( $I18N->msg( 'tablehead-hash' ) )
@@ -159,6 +190,14 @@ if ( !$snapshotInfo ) {
 		. '</th><th>'
 		. htmlspecialchars( $I18N->msg( 'tablehead-snapshots' ) )
 		. '</th></tr></thead><tbody>';
+
+	$updatelogLink = '';
+	if ( $kgTool->getUpdateLogFilePath() ) {
+		$updatelogLink = ' ' . Html::element( 'a', array(
+			'href' => $kgBaseTool->remoteBasePath . '?action=updatelog',
+		), $I18N->parentheses( 'updatelog-link' ) );
+	}
+
 	foreach ( $snapshotInfo as $repoName => $data ) {
 	if ( isset( $repoInfos[$repoName] ) ) {
 		$repo = $repoInfos[$repoName];
@@ -211,6 +250,11 @@ if ( !$snapshotInfo ) {
 				. $formBase
 				. Html::element( 'input', array(
 					'type' => 'hidden',
+					'name' => 'action',
+					'value' => 'getSnapshot'
+				))
+				. Html::element( 'input', array(
+					'type' => 'hidden',
 					'name' => 'repoName',
 					'value' => $repoName
 				))
@@ -225,7 +269,6 @@ if ( !$snapshotInfo ) {
 				. Html::element( 'input', array(
 					'type' => 'submit',
 					'nof' => true,
-					'name' => 'doGetSnapshot',
 					'value' => $I18N->msg( 'branches-submit-button' )
 				))
 				. '</div>'
@@ -236,6 +279,7 @@ if ( !$snapshotInfo ) {
 						'datetime' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
 						'title' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
 					), $kgTool->dumpTimeAgo( $data['_updateEnd'] ) )
+					. $updatelogLink
 				. '</p>'
 			. '</td>'
 			. '</tr>';

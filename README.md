@@ -3,6 +3,7 @@ ts-krinkle-mwSnapshots
 
 ## Install:
 * Create cache directory (chmod 755)
+* Create logs directory
 * Create local.php
 * Run updateSnaphots.php
 * Symlink ./cache/snapshots to ./public_html/snapshots

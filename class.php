@@ -33,6 +33,7 @@ class KrMwSnapshots extends KrToolBaseClass {
 	protected $settingsKeys = array(
 		'mediawikiCoreRepoDir',
 		'cacheDir',
+		'logsDir',
 	);
 
 	protected $infoCache;
@@ -62,6 +63,31 @@ class KrMwSnapshots extends KrToolBaseClass {
 			LOCK_EX
 		);
 		return $put !== false;
+	}
+
+	public function getUpdateLogContent() {
+		$updateLogFilePath = $this->getUpdateLogFilePath();
+		if ( !$updateLogFilePath ) {
+			return '';
+		}
+		$updateLogContent = file_get_contents( $updateLogFilePath );
+		return $updateLogContent;
+	}
+
+	public function getUpdateLogFilePath() {
+		$updateLogFilePath = $this->settings['logsDir'] . '/updateSnaphots.log';
+		return is_readable( $updateLogFilePath ) ? $updateLogFilePath  : false;
+	}
+
+	public function isUpdateLogActive() {
+		$updateLogFilePath = $this->getUpdateLogFilePath();
+		if ( !$updateLogFilePath ) {
+			return false;
+		}
+		$mtime = filemtime( $updateLogFilePath );
+		// If file was changed in the last 5 minutes,
+		// it may still be written to by the updator
+		return $mtime > strtotime( '1 minute ago' );
 	}
 
 	/**
