@@ -130,6 +130,7 @@ print "Remote branches: \n\t" . implode( "\n\t", $remoteBranchNames ) . "\n";
  * -------------------------------------------------
  */
 foreach ( $remoteBranchNames as $remoteBranchName ) {
+
 	print "\nBranch: {$remoteBranchName}\n";
 	if ( !kfMwSnapUtil_isGoodBranch( $remoteBranchName ) ) {
 		print "..skipping, not a good branch.\n";
@@ -139,14 +140,44 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	$branchName = preg_replace( '/^(' . preg_quote( $remoteRepository . '/', '/' ) . ')/', '', $remoteBranchName );
 	print "Normalized: {$branchName}\n";
 
+	$oldBranchInfo = isset( $oldSnapshotInfo['mediawiki-core']['branches'][$branchName] )
+		? $oldSnapshotInfo['mediawiki-core']['branches'][$branchName]
+		: false;
+
+	// Defaults, these are the value used if the snapshot creation failed for some reason.
+	// If this is a new branch, default to false. otherwise use the previous run info
+	// (which is either false or an array depending on what the previous run did).
+	$snapshotInfo['mediawiki-core']['branches'][$branchName] = array(
+		'snapshot' => $oldBranchInfo & isset( $oldBranchInfo['snapshot'] )
+			? $oldBranchInfo['snapshot']
+			: false
+	);
+
 	print "* Checking out...\n";
 	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) );
 
-	print "* Getting SHA1... \n";
-	$headSha1 = trim( kfShellExec( "git rev-parse --verify HEAD" ) );
-	if ( !GitInfo::isSHA1( $headSha1 ) ) {
-		print "* Could not get SHA1: {$headSha1}\n";
+	// Get revision of this branch. Used so we can verify the checkout worked
+	// (in the past the script failed once due to a .git/index.lock error, in which case
+	// the checkout command was aborted, and all the archives were for the same revision).
+	// This will not happen again because we're verifying that the HEAD of the branch matches
+	// the HEAD of the working copy after the checkout.
+	print "* Getting HEAD revision of branch...\n";
+	$branchHead = trim( kfShellExec( 'git rev-parse --verify ' . kfEscapeShellArg( $remoteBranchName ) ) );
+	print "  Found: $branchHead\n";
+
+	// Get the HEAD
+	print "* Getting HEAD of working copy... \n";
+	$currHead = trim( kfShellExec( "git rev-parse --verify HEAD" ) );
+	if ( !GitInfo::isSHA1( $currHead ) ) {
+		print "* Could not get SHA1: {$currHead}\n";
 		print "* Skipping branch $remoteBranchName\n";
+		continue;
+	} else {
+		print "  Found: $currHead\n";
+	}
+
+	if ( $branchHead !== $currHead ) {
+		print "ERROR: Current HEAD does not match branch head. Checkout likely failed. Skipping branch $remoteBranchName\n";
 		continue;
 	}
 
@@ -157,7 +188,7 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	$archiveFileName = 'mediawiki-snapshot-'
 		. kfMwSnapUtil_archiveNameSnippetFilter( $branchName )
 		. '-'
-		. kfMwSnapUtil_archiveNameSnippetFilter( substr( $headSha1, 0, 7 ) )
+		. kfMwSnapUtil_archiveNameSnippetFilter( substr( $currHead, 0, 7 ) )
 		. '.tar.gz';
 	$archiveFilePath = "$archiveDir/$archiveFileName";
 	print "* Preparing archive: $archiveFilePath \n";
@@ -177,7 +208,7 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	}
 
 	$snapshotInfo['mediawiki-core']['branches'][$branchName] = array(
-		'headSHA1' => $headSha1,
+		'headSHA1' => $currHead,
 		'headTimestamp' => intval( $headTimestamp ),
 		'snapshot' => !$archiveFilePath
 			? false
@@ -189,7 +220,7 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 			),
 	);
 
-	unset( $execOut, $headSha1, $headTimestamp );
+	unset( $execOut, $currHead, $headTimestamp );
 	unset( $archiveFileName, $archiveFilePath, $archiveFilePathEscaped );
 }
 

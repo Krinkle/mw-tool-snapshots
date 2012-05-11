@@ -13,8 +13,8 @@ $I18N = new TsIntuition( 'Mwsnapshots' );
 $toolConfig = array(
 	'displayTitle'     => 'mwSnapshots',
 	'remoteBasePath'   => $kgConf->getRemoteBase() . '/mwSnapshots/',
-	'revisionId'       => '0.0.2',
-	'revisionDate'     => '2012-05-08',
+	'revisionId'       => '0.0.3',
+	'revisionDate'     => '2012-05-11',
 	'I18N'             => $I18N,
 	'styles'           => array(
 		'main.css',

@@ -5,6 +5,9 @@ ts-krinkle-mwSnapshots
 * Create cache directory (chmod 755)
 * Create logs directory
 * Create local.php
+* Create remotes directory
+* Inside the remotes directory, run:<br>
+  `git clone https://gerrit.wikimedia.org/r/p/mediawiki/core.git mediawiki-core`
 * Run updateSnaphots.php
 * Symlink ./cache/snapshots to ./public_html/snapshots
 * Schedule updateSnaphots.php to run hourly<br>
