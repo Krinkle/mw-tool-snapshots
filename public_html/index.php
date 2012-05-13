@@ -37,8 +37,8 @@ $pageHtml = '';
  * -------------------------------------------------
  */
 if ( !$snapshotInfo ) {
-	$kgBaseTool->addOut( $I18N->msg( 'title-overview' ), 'h2' );
-	$pageHtml = kfMsgBlock( $I18N->msg( 'err-snapshotindex' ), 'warning error' );
+	$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-overview' ) );
+	$pageHtml .= kfMsgBlock( $I18N->msg( 'err-snapshotindex' ), 'warning error' );
 
 /**
  * Output (show update log)
@@ -46,7 +46,7 @@ if ( !$snapshotInfo ) {
  */
 } elseif ( $kgReq->getVal( 'action' ) === 'updatelog' ) {
 
-	$kgBaseTool->addOut( $I18N->msg( 'title-updatelog' ), 'h2' );
+	$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-updatelog' ) );
 	$pageHtml .= Html::element( 'p', array(), $I18N->msg( 'updatelog-intro' ) );
 
 	if ( !$kgTool->getUpdateLogFilePath() ) {
@@ -54,8 +54,8 @@ if ( !$snapshotInfo ) {
 		$pageHtml .= kfMsgBlock( $I18N->msg( 'err-noupdatelog' ), 'warning' );
 	} else {
 		$notice = $kgTool->isUpdateLogActive()
-			 ? kfMsgBlock( $I18N->msg( 'updatelog-active' ), 'warning' )
-			 : '';
+			? kfMsgBlock( $I18N->msg( 'updatelog-active' ), 'warning' )
+			: '';
 
 		$pageHtml .= '<hr/>'
 			. $notice
@@ -71,105 +71,149 @@ if ( !$snapshotInfo ) {
  */
 } elseif ( $kgReq->wasPosted() && $kgReq->getVal( 'action' ) === 'getSnapshot' ) {
 
-	$repoName = $kgReq->getVal( 'repoName' );
-	$branch = $kgReq->getVal( 'branch' );
+	$repoName = $kgReq->getVal( 'repo' );
+	$branchName = $kgReq->getVal( 'branch' );
+	$isAjax = $kgReq->getBool( 'ajax' );
+	$downloadUrl = null;
 
 	if ( !isset( $repoInfos[$repoName] ) || !isset( $snapshotInfo[$repoName] ) ) {
 		// Error: Invalid repo
-		$kgBaseTool->addOut( $I18N->msg( 'title-error' ), 'h2' );
+		$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-error' ) );
 		$pageHtml .= kfMsgBlock( $I18N->msg( 'err-invalid-repo', array(
 				'variables' => array( $repoName )
 		) ), 'warning' );
 	} else {
 		$repoInfo = $repoInfos[$repoName];
 		$data = $snapshotInfo[$repoName];
-		if ( !isset( $data['branches'][$branch] ) ) {
+		if ( !isset( $data['branches'][$branchName] ) ) {
 			// Error: Invalid branch
-			$kgBaseTool->addOut( $I18N->msg( 'title-error' ), 'h2' );
+			$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-error' ) );
 			$pageHtml .= kfMsgBlock( $I18N->msg( 'err-invalid-branch', array(
-				'variables' => array( $branch, $repoName )
+				'variables' => array( $branchName, $repoName )
 			) ), 'warning' );
-		} elseif ( $data['branches'][$branch]['snapshot'] == false ) {
+		} elseif ( $data['branches'][$branchName]['snapshot'] == false ) {
 			// Error: Snapshot unavaiable
-			$kgBaseTool->addOut( $I18N->msg( 'title-error' ), 'h2' );
+			$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-error' ) );
 			$pageHtml .= kfMsgBlock( $I18N->msg( 'err-nosnapshot', array(
-				'variables' => array( $branch )
+				'variables' => array( $branchName )
 			) ), 'warning' );
 		} else {
-			$branchInfo = $data['branches'][$branch];
+			$branchInfo = $data['branches'][$branchName];
 			// Downoading snapshot
-			$kgBaseTool->addOut( $I18N->msg( 'title-downloading', array(
-				'variables' => array( $branchInfo['snapshot']['path'] )
-			) ), 'h2' );
+
 			$downloadUrl = $kgTool->getDownloadUrl( $repoName, $branchInfo );
-			$pageHtml .= '<p>'
-				. Html::element( 'strong', array(), $I18N->msg( 'downloading-intro' ) )
-				. ' '
-				. Html::element( 'a', array( 'href' => $downloadUrl ), $I18N->msg( 'downloading-directlink' ) )
-				. '</p>'
-				. '<table class="wikitable krinkle-mwSnapshots-download"><tbody>'
-					. '<tr><th>'
-					. htmlspecialchars( $I18N->msg( 'tablehead-repo' ) )
-					. '</th><td>'
-						. Html::element( 'a', array(
-								'href' => $repoInfo['site-url'],
-								'target' => '_blank',
-							),
-							$repoInfo['display-title']
+
+			if ( !$isAjax ) {
+				$pageHtml .= Html::element( 'h2', array(),
+					$I18N->msg( 'title-downloadpage', array(
+						'variables' => array( $branchInfo['snapshot']['path'] )
+					) )
+				)
+				. '<p>'
+				. Html::element( 'a', array( 'href' => $downloadUrl ), $I18N->msg( 'downloadpage-directlink' ) )
+				. '</p>';
+			} else {
+				$pageHtml .= Html::element( 'h2', array(),
+					$I18N->msg( 'title-download', array(
+						'variables' => array( $branchInfo['snapshot']['path'] )
+					) )
+				);
+			}
+
+			$pageHtml .=
+				'<table class="wikitable krinkle-mwSnapshots-download-box"><tbody>'
+				. '<tr><th>'
+				. htmlspecialchars( $I18N->msg( 'tablehead-repo' ) )
+				. '</th><td>'
+					. Html::element( 'a', array(
+							'href' => $repoInfo['site-url'],
+							'target' => '_blank',
+						),
+						$repoInfo['display-title']
+					)
+				. '</td></tr>'
+				. '<tr><th>'
+				. htmlspecialchars( $I18N->msg( 'tablehead-branch' ) )
+				. '</th><td>'
+					. Html::element( 'a', array(
+							'href' => str_replace( '$1', $branchName, $repoInfo['repo-branch-url'] ),
+							'target' => '_blank',
+						),
+						$branchName
+					)
+				. '</td></tr>'
+				. '<tr><th dir="ltr" lang="en">'
+				. 'HEAD'
+				. '</th><td>'
+					. Html::element( 'a', array(
+							'href' => str_replace( '$1', $branchInfo['headSHA1'], $repoInfo['repo-commit-url'] ),
+							'target' => '_blank',
+							'dir' => 'ltr',
+							'lang' => 'en',
+						),
+						$branchInfo['headSHA1']
+					)
+				.	'<br>'
+					. htmlspecialchars( $I18N->msg( 'repo-lastmoddate-label' ) )
+					. ' '
+					. htmlspecialchars( gmdate( 'r', $branchInfo['headTimestamp'] ) )
+				. '</td></tr>'
+				. '<tr><th>'
+				. htmlspecialchars( $I18N->msg( 'tablehead-filesize' ) )
+				. '</th><td>'
+					. kfFormatBytes( $branchInfo['snapshot']['byteSize'] )
+					. ' '
+					. $I18N->msg( 'parentheses', array(
+						'domain' => 'general',
+						'variables' => array(
+							$branchInfo['snapshot']['byteSize'] . ' bytes'
 						)
-					. '</td></tr>'
-					. '<tr><th>'
-					. htmlspecialchars( $I18N->msg( 'tablehead-branch' ) )
-					. '</th><td>'
-						. Html::element( 'a', array(
-								'href' => str_replace( '$1', $branch, $repoInfo['repo-branch-url'] ),
-								'target' => '_blank',
-							),
-							$branch
-						)
-					. '</td></tr>'
-					. '<tr><th dir="ltr" lang="en">'
-					. 'HEAD'
-					. '</th><td>'
-						. Html::element( 'a', array(
-								'href' => str_replace( '$1', $branchInfo['headSHA1'], $repoInfo['repo-commit-url'] ),
-								'target' => '_blank',
-								 'dir' => 'ltr',
-								 'lang' => 'en',
-							),
-							$branchInfo['headSHA1']
-						)
-					.	 '<br>'
-						. htmlspecialchars( $I18N->msg( 'repo-lastmoddate-label' ) )
-						. ' '
-						. htmlspecialchars( gmdate( 'r', $branchInfo['headTimestamp'] ) )
-					. '</td></tr>'
-					. '<tr><th>'
-					. htmlspecialchars( $I18N->msg( 'tablehead-filesize' ) )
-					. '</th><td>'
-						. kfFormatBytes( $branchInfo['snapshot']['byteSize'] )
-						. ' '
-						. $I18N->msg( 'parentheses', array(
-							'domain' => 'general',
-							'variables' => array(
-								$branchInfo['snapshot']['byteSize'] . ' bytes'
-							)
-						))
-					. '</td></tr>'
-					. '<tr><th>'
-					. htmlspecialchars( $I18N->msg( 'tablehead-hash' ) )
-					. '</th><td dir="ltr" lang="en">'
-						. 'MD5: ' . htmlspecialchars( $branchInfo['snapshot']['hashMD5'] )
-						. '<br>SHA1: ' . htmlspecialchars( $branchInfo['snapshot']['hashSHA1'] )
-					. '</td></tr>'
-				. '</tbody></table>'
-				. '<script>'
+					))
+				. '</td></tr>'
+				. '<tr><th>'
+				. htmlspecialchars( $I18N->msg( 'tablehead-hash' ) )
+				. '</th><td dir="ltr" lang="en">'
+					. 'MD5: ' . htmlspecialchars( $branchInfo['snapshot']['hashMD5'] )
+					. '<br>SHA1: ' . htmlspecialchars( $branchInfo['snapshot']['hashSHA1'] )
+				. '</td></tr>'
+			. '</tbody></table>';
+
+			if ( $isAjax ) {
+				$pageHtml = '<div class="krinkle-mwSnapshots-download-badge">'
+				. '<button>&darr;<br/>' . $I18N->msg( 'download-button', array(
+					'variables' => array( $branchName ),
+					'escape' => 'html'
+				) )
+				. '</button><br/>'
+				. $I18N->parensWrap(
+					Html::element( 'a', array(
+							'href'=> $downloadUrl,
+						),
+						$I18N->msg( 'download-directlink' )
+					)
+				)
+				. '</div>'
+				. $pageHtml;
+			} else {
+				$pageHtml .= '<script>'
 				. 'setTimeout(function () {'
 				. 'var downloadUrl = ' . json_encode( $downloadUrl ) . ';'
 				. 'window.location.href = downloadUrl;'
 				. '}, 1000);'
 				. '</script>';
+			}
+
 		}
+	}
+
+	if ( $isAjax ) {
+		kfApiExport(
+			array(
+				'pageHtml' => $pageHtml,
+				'downloadUrl' => $downloadUrl,
+			),
+			'json' );
+		exit;
 	}
 
 
@@ -178,14 +222,9 @@ if ( !$snapshotInfo ) {
  * -------------------------------------------------
  */
 } else {
-	$kgBaseTool->addOut( $I18N->msg( 'title-overview' ), 'h2' );
+	$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-overview' ) );
 
-	$formBase = Html::openElement( 'form', array(
-		'action' => $kgBaseTool->remoteBasePath,
-		'method' => 'post',
-	));
-
-	$pageHtml .= '<table class="wikitable krinkle-mwSnapshots-repos"><thead><tr><th colspan="2">'
+	$pageHtml .= '<table class="wikitable krinkle-mwSnapshots-repos-box"><thead><tr><th colspan="2">'
 		. htmlspecialchars( $I18N->msg( 'tablehead-repo' ) )
 		. '</th><th>'
 		. htmlspecialchars( $I18N->msg( 'tablehead-snapshots' ) )
@@ -193,9 +232,13 @@ if ( !$snapshotInfo ) {
 
 	$updatelogLink = '';
 	if ( $kgTool->getUpdateLogFilePath() ) {
-		$updatelogLink = ' ' . Html::element( 'a', array(
-			'href' => $kgBaseTool->remoteBasePath . '?action=updatelog',
-		), $I18N->parentheses( 'updatelog-link' ) );
+		$updatelogLink = ' ' . $I18N->parensWrap(
+			Html::element( 'a', array(
+					'href' => $kgBaseTool->remoteBasePath . '?action=updatelog',
+				),
+				$I18N->msg( 'updatelog-link' )
+			)
+		);
 	}
 
 	foreach ( $snapshotInfo as $repoName => $data ) {
@@ -203,7 +246,9 @@ if ( !$snapshotInfo ) {
 		$repo = $repoInfos[$repoName];
 		$branchesSelect = Html::openElement( 'select', array(
 			'name' => 'branch',
-			'id' => 'branches-' . $repoName,
+			'class' => 'krinkle-mwSnapshots-branches',
+			'data-repo-name' => $repoName,
+			'id' => 'krinkle-mwSnapshots-branches-' . $repoName,
 		));
 		foreach ( $data['branches'] as $branch => $branchInfo ) {
 			$branchesSelect .= Html::element( 'option', array(
@@ -219,35 +264,42 @@ if ( !$snapshotInfo ) {
 			'<tr><td class="krinkle-mwSnapshots-repo-logo">'
 				. ( isset( $repo['img'] )
 					? Html::element( 'img', array(
-							'src' => $repo['img'],
-							'width' => '135'
-						)
-					)
+						'src' => $repo['img'],
+						'width' => '135',
+						'height' => '135'
+					))
 					: ''
 				)
 			. '</td><td class="krinkle-mwSnapshots-repo-title">'
 				. '<p><strong>'
 				. Html::element( 'a', array(
 						'href' => $repo['site-url'],
-							'target' => '_blank',
-					), $repo['display-title']
+						'target' => '_blank',
+					),
+					$repo['display-title']
 				)
 				. '</strong></p>'
 				. '<ul>'
 					. '<li>' . Html::element( 'a', array(
 							'href' => $repo['site-url'],
 							'target' => '_blank',
-						), $I18N->msg( 'repo-site-link' )
+						),
+						$I18N->msg( 'repo-site-link' )
 					)
 					. '</li><li>' . Html::element( 'a', array(
 							'href' => $repo['repo-browse-url'],
 							'target' => '_blank',
-						), $I18N->msg( 'repo-browse-link' )
+						),
+						$I18N->msg( 'repo-browse-link' )
 					)
 					. '</li>'
 				. '</ul>'
-			. '</td><td class="krinkle-mwSnapshots-repo-select">'
-				. $formBase
+			. '</td><td>'
+				. Html::openElement( 'form', array(
+					'action' => $kgBaseTool->remoteBasePath,
+					'method' => 'post',
+					'class' => 'krinkle-mwSnapshots-repo-select',
+				))
 				. Html::element( 'input', array(
 					'type' => 'hidden',
 					'name' => 'action',
@@ -255,11 +307,11 @@ if ( !$snapshotInfo ) {
 				))
 				. Html::element( 'input', array(
 					'type' => 'hidden',
-					'name' => 'repoName',
+					'name' => 'repo',
 					'value' => $repoName
 				))
 				. Html::element( 'label', array(
-						'for' => 'branches-' . $repoName
+						'for' => 'krinkle-mwSnapshots-branches-' . $repoName
 					),
 					$I18N->msg( 'repo-branches-label' )
 				)
@@ -275,10 +327,12 @@ if ( !$snapshotInfo ) {
 				. '</form>'
 				. '<p class="krinkle-mwSnapshots-repo-dumpdate">Last dump: '
 					. Html::element( 'time', array(
-						'pubdate' => true,
-						'datetime' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
-						'title' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
-					), $kgTool->dumpTimeAgo( $data['_updateEnd'] ) )
+							'pubdate' => true,
+							'datetime' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
+							'title' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
+						),
+						$kgTool->dumpTimeAgo( $data['_updateEnd'] )
+					)
 					. $updatelogLink
 				. '</p>'
 			. '</td>'
@@ -289,6 +343,7 @@ if ( !$snapshotInfo ) {
 	}
 	}
 	$pageHtml .= '</tbody></table>';
+	$pageHtml .= '<div id="krinkle-mwSnapshots-ajax"></div>';
 }
 
 $kgBaseTool->addOut( $pageHtml );
