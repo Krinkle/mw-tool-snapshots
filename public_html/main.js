@@ -1,17 +1,7 @@
 (function (K, $) {
-	var $branchesSelects, $first, $ajaxTarget, $pageWrap, $loader;
+	var $ajaxTarget, $branchesSelects, $first, $loader, $pageWrap, prevRepoBranch;
 
-	$loader = $('<div class="cssloader-circles krinkle-mwSnapshots-ajax-loader">\
-		<div class="cssloader-circles-item cssloader-circles-item1"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item2"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item3"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item4"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item5"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item6"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item7"></div>\
-		<div class="cssloader-circles-item cssloader-circles-item8"></div>\
-		</div>'
-	);
+	$loader = $('<div class="krinkle-mwSnapshots-ajax-loader"></div>');
 
 	function showAjaxInfo(repo, branch) {
 		function getAjaxInfo() {
@@ -58,7 +48,10 @@
 			});
 		}
 
-		$ajaxTarget.fadeOut(getAjaxInfo);
+		if (prevRepoBranch !== (repo + branch)) {
+			prevRepoBranch = repo + branch;
+			$ajaxTarget.fadeOut(getAjaxInfo);
+		}
 	}
 
 	$(document).ready(function ($) {

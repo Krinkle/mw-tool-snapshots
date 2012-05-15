@@ -327,9 +327,9 @@ if ( !$snapshotInfo ) {
 				. '</form>'
 				. '<p class="krinkle-mwSnapshots-repo-dumpdate">Last dump: '
 					. Html::element( 'time', array(
-							'pubdate' => true,
+							'itemprop' => 'published',
 							'datetime' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
-							'title' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
+							'title' => gmdate( 'Y-m-d H:i:s', $data['_updateEnd'] ) . ' (UTC)',
 						),
 						$kgTool->dumpTimeAgo( $data['_updateEnd'] )
 					)

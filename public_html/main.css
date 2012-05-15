@@ -30,7 +30,12 @@
 }
 
 .krinkle-mwSnapshots-ajax-loader {
+	display: block;
 	margin: 0 auto;
+	padding: 21px 0 56px 0;
+	width: 48px;
+	height: 48px;
+	background: transparent url(loader-48.gif) no-repeat 50% 50%;
 }
 
 .krinkle-mwSnapshots-repo-dumpdate {
@@ -54,122 +59,4 @@
 	font-weight: bold;
 	font-size: larger;
 	text-align: center;
-}
-
-/**
- * Courtesy to http://www.cssload.net/ for the awesome CSS3 spinner
- * Support: FF 5+, Chrome, Opera 12+, IE10+, Safari 4+
- * (and most webkit browsers, incl. Android 2 and Mobile Safari)
- */
-.cssloader-circles {
-	position: relative;
-	width: 70px;
-	height: 70px;
-	-webkit-transform: scale(0.6);
-	-moz-transform: scale(0.6);
-	-o-transform: scale(0.6);
-	-ms-transform: scale(0.6);
-}
-.cssloader-circles-item {
-	position:absolute;
-	background-color:#FFFFFF;
-	height:13px;
-	width:13px;
-	-moz-border-radius:6px;
-	-webkit-border-radius:6px;
-	border-radius:6px;
-	-webkit-animation-name:cssloader-anim-fade;
-	-webkit-animation-duration:0.8s;
-	-webkit-animation-iteration-count:infinite;
-	-webkit-animation-direction:linear;
-	-moz-animation-name:cssloader-anim-fade;
-	-moz-animation-duration:0.8s;
-	-moz-animation-iteration-count:infinite;
-	-moz-animation-direction:linear;
-	-o-animation-name:cssloader-anim-fade;
-	-o-animation-duration:0.8s;
-	-o-animation-iteration-count:infinite;
-	-o-animation-direction:linear;
-	-ms-animation-name:cssloader-anim-fade;
-	-ms-animation-duration:0.8s;
-	-ms-animation-iteration-count:infinite;
-	-ms-animation-direction:linear;
-}
-.cssloader-circles-item1 {
-	left:0;
-	top:29px;
-	-webkit-animation-delay:0.1s;
-	-moz-animation-delay:0.1s;
-	-o-animation-delay:0.1s;
-	-ms-animation-delay:0.1s;
-}
-.cssloader-circles-item2 {
-	left:8px;
-	top:8px;
-	-webkit-animation-delay:0.2s;
-	-moz-animation-delay:0.2s;
-	-o-animation-delay:0.2s;
-	-ms-animation-delay:0.2s;
-}
-.cssloader-circles-item3 {
-	left:29px;
-	top:0;
-	-webkit-animation-delay:0.3s;
-	-moz-animation-delay:0.3s;
-	-o-animation-delay:0.3s;
-	-ms-animation-delay:0.3s;
-}
-.cssloader-circles-item4 {
-	right:8px;
-	top:8px;
-	-webkit-animation-delay:0.4s;
-	-moz-animation-delay:0.4s;
-	-o-animation-delay:0.4s;
-	-ms-animation-delay:0.4s;
-}
-.cssloader-circles-item5 {
-	right:0;
-	top:29px;
-	-webkit-animation-delay:0.5s;
-	-moz-animation-delay:0.5s;
-	-o-animation-delay:0.5s;
-	-ms-animation-delay:0.5s;
-}
-.cssloader-circles-item6 {
-	right:8px;
-	bottom:8px;
-	-webkit-animation-delay:0.6s;
-	-moz-animation-delay:0.6s;
-	-o-animation-delay:0.6s;
-	-ms-animation-delay:0.6s;
-}
-.cssloader-circles-item7 {
-	left:29px;
-	bottom:0;
-	-webkit-animation-delay:0.7s;
-	-moz-animation-delay:0.7s;
-}
-.cssloader-circles-item8 {
-	left:8px;
-	bottom:8px;
-	-webkit-animation-delay:0.8s;
-	-moz-animation-delay:0.8s;
-	-o-animation-delay:0.8s;
-	-ms-animation-delay:0.8s;
-}
-@-webkit-keyframes cssloader-anim-fade {
-	0% { background-color:#000000; }
-	100% { background-color:#FFFFFF; }
-}
-@-moz-keyframes cssloader-anim-fade {
-	0% { background-color:#000000; }
-	100% { background-color:#FFFFFF; }
-}
-@-o-keyframes cssloader-anim-fade {
-	0% { background-color:#000000; }
-	100% { background-color:#FFFFFF; }
-}
-@-ms-keyframes cssloader-anim-fade {
-	0% { background-color:#000000; }
-	100% { background-color:#FFFFFF; }
 }
