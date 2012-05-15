@@ -147,11 +147,9 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	// Defaults, these are the value used if the snapshot creation failed for some reason.
 	// If this is a new branch, default to false. otherwise use the previous run info
 	// (which is either false or an array depending on what the previous run did).
-	$snapshotInfo['mediawiki-core']['branches'][$branchName] = array(
-		'snapshot' => $oldBranchInfo & isset( $oldBranchInfo['snapshot'] )
-			? $oldBranchInfo['snapshot']
-			: false
-	);
+	if ( $oldBranchInfo ) {
+		$snapshotInfo['mediawiki-core']['branches'][$branchName] = $oldBranchInfo;
+	}
 
 	print "* Checking out...\n";
 	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) );
