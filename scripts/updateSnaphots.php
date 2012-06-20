@@ -154,17 +154,18 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	print "* Checking out...\n";
 	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) );
 
-	// Get revision of this branch. Used so we can verify the checkout worked
+	// Get revision of this branch. Used so we can check that the checkout worked
 	// (in the past the script failed once due to a .git/index.lock error, in which case
 	// the checkout command was aborted, and all the archives were for the same revision).
-	// This will not happen again because we're verifying that the HEAD of the branch matches
-	// the HEAD of the working copy after the checkout.
-	print "* Getting HEAD revision of branch...\n";
+	// This will not happen again because we're now verifying that the remote branch head
+	// matches the HEAD of the working copy after the checkout.
+	print "* Getting current head of branch...\n";
+
 	$branchHead = trim( kfShellExec( 'git rev-parse --verify ' . kfEscapeShellArg( $remoteBranchName ) ) );
 	print "  Found: $branchHead\n";
 
-	// Get the HEAD
-	print "* Getting HEAD of working copy... \n";
+	print "* Comparing against HEAD of working copy to check if checkout worked... \n";
+
 	$currHead = trim( kfShellExec( "git rev-parse --verify HEAD" ) );
 	if ( !GitInfo::isSHA1( $currHead ) ) {
 		print "* Could not get SHA1: {$currHead}\n";
