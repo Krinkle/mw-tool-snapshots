@@ -80,15 +80,7 @@ function kfMwSnapUtil_gitCleanAndReset() {
 	// main "dev wiki" repo dir for this, because it'll nuke stuff like
 	// LocalSettings.php away as well.
 	print "Brute force clean up and reset...\n";
-	foreach( array(
-		"rm -f .git/index.lock;", // For some reason this keeps happening every few weeks
-		"git clean -d -x --force;",
-		"git reset --hard HEAD;",
-		"git checkout master;",
-	) as $cmd ) {
-		print "* $cmd\n";
-		kfShellExec( $cmd );
-	}
+	print kfGitCleanReset( /*$otherPath=*/null, 'master', /*$mayUnlock=*/true );
 	print "\n";
 }
 
