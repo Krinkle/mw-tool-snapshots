@@ -63,8 +63,16 @@ function kfMwSnapUtil_trimSplitCleanLines( $input ) {
 }
 
 function kfMwSnapUtil_isGoodBranch( $input ) {
-	// Skip stuff like "HEAD -> origin/master"
-	return strpos( $input, '->' ) === false;
+	if (
+		// Skip stuff like "HEAD -> origin/master"
+		strpos( $input, '->' ) !== false
+		// Skip the <remote>/sandbox/<user>/<topic> branches
+		|| strpos( $input, '/sandbox/' ) !== false
+	) {
+		return false;
+	}
+
+	return true;
 }
 
 /** @return string: filtered string */
