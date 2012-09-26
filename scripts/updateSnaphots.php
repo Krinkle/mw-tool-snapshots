@@ -14,12 +14,12 @@ $snapshotInfo = array();
 // Get old index file
 $oldSnapshotInfo = $kgTool->getInfoCache();
 
-print "
+print '
 --
--- " . date( 'r' ) . "
+-- ' . date( 'r' ) . '
 -- Starting update process for snapshots of mediawiki-core...
 --
-";
+';
 $snapshotInfo['mediawiki-core'] = array(
 	'_updateStart' => time(),
 	'_updateEnd' => time(),
@@ -65,14 +65,21 @@ function kfMwSnapUtil_trimSplitCleanLines( $input ) {
 function kfMwSnapUtil_isGoodBranch( $input ) {
 	if (
 		// Skip stuff like "HEAD -> origin/master"
-		strpos( $input, '->' ) !== false
-		// Skip the <remote>/sandbox/<user>/<topic> branches
-		|| strpos( $input, '/sandbox/' ) !== false
+		strpos( $input, '->' ) === false
+
+			// Skip the <remote>/sandbox/<user>/<topic> branches
+			&& strpos( $input, '/sandbox/' ) === false
+
+			// Only keep master, REL* and wmf*
+			&& ( strpos( $input, '/REL' ) !== false
+				|| strpos( $input, '/wmf' ) !== false
+				|| strpos( $input, '/master' ) !== false
+			)
 	) {
-		return false;
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 /** @return string: filtered string */
@@ -87,8 +94,11 @@ function kfMwSnapUtil_gitCleanAndReset() {
 	// and other crap. Beware that if you run this locally, dont use your
 	// main "dev wiki" repo dir for this, because it'll nuke stuff like
 	// LocalSettings.php away as well.
-	print "Brute force clean up and reset...\n";
-	print kfGitCleanReset( /*$otherPath=*/null, 'master', /*$mayUnlock=*/true );
+	print "Forced clean up and reset...\n";
+	print kfGitCleanReset( array(
+		'checkout' => 'master',
+		'unlock' => true,
+	) );
 	print "\n";
 }
 
@@ -99,8 +109,8 @@ function kfMwSnapUtil_gitCleanAndReset() {
 
 kfMwSnapUtil_gitCleanAndReset();
 
-print "Pull updates from remote...\n";
-kfShellExec( "git pull --all --force" );
+print "Fetch updates from remotes...\n";
+kfShellExec( "git fetch --all" );
 
 // Get remotes (in order to check if there are multiple (which we don't support),
 // and so that we can use this name to substract it from the remote branche names.
@@ -132,14 +142,14 @@ print "Remote branches: \n\t" . implode( "\n\t", $remoteBranchNames ) . "\n";
  */
 foreach ( $remoteBranchNames as $remoteBranchName ) {
 
-	print "\nBranch: {$remoteBranchName}\n";
+	print "\n== Remote: {$remoteBranchName} ==\n\n";
 	if ( !kfMwSnapUtil_isGoodBranch( $remoteBranchName ) ) {
-		print "..skipping, not a good branch.\n";
+		print "..skipping, not a good branch name.\n";
 		continue;
 	}
 	// "gerrit/foobar" or "origin/foobar" -> "foobar"
 	$branchName = preg_replace( '/^(' . preg_quote( $remoteRepository . '/', '/' ) . ')/', '', $remoteBranchName );
-	print "Normalized: {$branchName}\n";
+	print "* Normalized: {$branchName}\n";
 
 	$oldBranchInfo = isset( $oldSnapshotInfo['mediawiki-core']['branches'][$branchName] )
 		? $oldSnapshotInfo['mediawiki-core']['branches'][$branchName]
@@ -152,63 +162,77 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 		$snapshotInfo['mediawiki-core']['branches'][$branchName] = $oldBranchInfo;
 	}
 
-	print "* Checking out...\n";
-	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) );
+	$branchHead = trim( kfShellExec( 'git rev-parse --verify ' . kfEscapeShellArg( $remoteBranchName ) ) );
+	print "* Branch head: $branchHead\n";
+
+	$archiveFileName = 'mediawiki-snapshot-'
+		. kfMwSnapUtil_archiveNameSnippetFilter( $branchName )
+		. '-'
+		. kfMwSnapUtil_archiveNameSnippetFilter( substr( $branchHead, 0, 7 ) )
+		. '.tar.gz';
+	$archiveFilePath = "$archiveDir/$archiveFileName";
+
+	print "Preparing to create archive at $archiveFilePath\n";
+	if ( file_exists( $archiveFilePath ) ) {
+		print "> A snapshot of this exact version already exists, no update needed.\n";
+		continue;
+	}
+
+	print "Checking out $remoteBranchName...\n";
+	// We're checking out a remote branch head, which means we'll go into a headless (no branch)
+	// state, surpress the informative mesage with -q.
+	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) . ' -q' );
 
 	// Get revision of this branch. Used so we can check that the checkout worked
 	// (in the past the script failed once due to a .git/index.lock error, in which case
 	// the checkout command was aborted, and all the archives were for the same revision).
 	// This will not happen again because we're now verifying that the remote branch head
 	// matches the HEAD of the working copy after the checkout.
-	print "* Getting current head of branch...\n";
-
-	$branchHead = trim( kfShellExec( 'git rev-parse --verify ' . kfEscapeShellArg( $remoteBranchName ) ) );
-	print "  Found: $branchHead\n";
-
-	print "* Comparing against HEAD of working copy to check if checkout worked... \n";
-
+	print "Verifiying checkout succeeded...\n";
 	$currHead = trim( kfShellExec( "git rev-parse --verify HEAD" ) );
 	if ( !GitInfo::isSHA1( $currHead ) ) {
-		print "* Could not get SHA1: {$currHead}\n";
-		print "* Skipping branch $remoteBranchName\n";
+		print "> rev-parse failed for HEAD: {$currHead}\n";
+		print "> Skipping $remoteBranchName...\n";
 		continue;
-	} else {
-		print "  Found: $currHead\n";
 	}
 
 	if ( $branchHead !== $currHead ) {
-		print "ERROR: Current HEAD does not match branch head. Checkout likely failed. Skipping branch $remoteBranchName\n";
+		print "> ERROR: Current HEAD does not match remote branch head. Checkout likely failed. Skipping $remoteBranchName...\n";
 		continue;
 	}
 
 	// Get AuthorDate of latest commit this branch (Author instead of Commit)
-	print "* Getting timestamp... \n";
 	$headTimestamp = kfShellExec( "git show HEAD --format='%at' -s" );
 
-	$archiveFileName = 'mediawiki-snapshot-'
-		. kfMwSnapUtil_archiveNameSnippetFilter( $branchName )
-		. '-'
-		. kfMwSnapUtil_archiveNameSnippetFilter( substr( $currHead, 0, 7 ) )
-		. '.tar.gz';
-	$archiveFilePath = "$archiveDir/$archiveFileName";
-	print "* Preparing archive: $archiveFilePath \n";
+	print "Generating new archive...\n";
+	$archiveFilePathEscaped = kfEscapeShellArg( $archiveFilePath );
+	// Toolserver's git doesn't support --format='tar.gz', using 'tar' and piping to gzip instead
+	$execOut = kfShellExec( "git archive HEAD --format='tar' | gzip > {$archiveFilePathEscaped}" );
 	if ( file_exists( $archiveFilePath ) ) {
-		print "  An archive for this version already exists, no update needed.\n";
+		print "> Done!\n";
 	} else {
-		print "* Existing archive is outdated, generating new archive...\n";
-		$archiveFilePathEscaped = kfEscapeShellArg( $archiveFilePath );
-		// Toolserver's git doesn't support --format='tar.gz', using 'tar' and piping to gzip instead
-		$execOut = kfShellExec( "git archive HEAD --format='tar' | gzip > {$archiveFilePathEscaped}" );
-		if ( file_exists( $archiveFilePath ) ) {
-			print "  Done!\n";
-		} else {
-			$archiveFilePath =  false;
-			print "  FAILED!\n";
+		$archiveFilePath =  false;
+		print "> FAILED!\n";
+	}
+
+	if ( $branchName === 'master' ) {
+		print "There is a new archive of the master branch, update '-latest' symlink...\n";
+		$masterSymlinkName = 'mediawiki-latest.tar.gz';
+		$masterSymlinkPath = "$archiveDir/$masterSymlinkName";
+		if ( file_exists( $masterSymlinkPath ) ) {
+			if ( !unlink( $masterSymlinkPath ) ) {
+				print "> Error: Could not remove old one";
+			}
 		}
+		if ( link( /* target= */ $archiveFilePath, /* link = */ $masterSymlinkPath ) ) {
+			print "> Done\n";
+		} else {
+				print "> Error: Could not create new symlink\n";
+			}
 	}
 
 	$snapshotInfo['mediawiki-core']['branches'][$branchName] = array(
-		'headSHA1' => $currHead,
+		'headSHA1' => $branchHead,
 		'headTimestamp' => intval( $headTimestamp ),
 		'snapshot' => !$archiveFilePath
 			? false
@@ -220,8 +244,17 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 			),
 	);
 
-	unset( $execOut, $currHead, $headTimestamp );
-	unset( $archiveFileName, $archiveFilePath, $archiveFilePathEscaped );
+	unset(
+		$branchName,
+		$oldBranchInfo,
+		$branchHead,
+		$archiveFileName,
+		$archiveFilePath,
+		$execOut,
+		$currHead,
+		$headTimestamp,
+		$archiveFilePathEscaped
+	);
 }
 
 print "\n";
@@ -238,34 +271,32 @@ $kgTool->setInfoCache( $snapshotInfo );
 print "\n";
 
 // Loop through and if there was an update, nuke the old snapshot
-print "Remove old snapshots of branches that have newer versions now...\n";
+print "Remove unused snapshots...\n";
 if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
-	print "* ERROR. Previous index file is in invalid format. Content: \n-- START OF FILE\n$oldSnapshotInfo\n-- END OF FILE\n";
+	print "> ERROR. Previous index file is in invalid format. Content: \n-- START OF FILE\n$oldSnapshotInfo\n-- END OF FILE\n";
 } else {
 	$oldBranchInfos = $oldSnapshotInfo['mediawiki-core']['branches'];
 	$newBranchInfos = $snapshotInfo['mediawiki-core']['branches'];
 	foreach ( $oldBranchInfos as $branch => $oldBranchInfo ) {
-		print "* $branch:\n\t";
+		print "* $branch:\n";
 		if ( !isset( $newBranchInfos[$branch] ) || $newBranchInfos[$branch]['snapshot'] == false ) {
-			print "NOTICE. New index does not have this branch. Leaving old snapshot {$oldBranchInfo['snapshot']['path']}";
+			print "  > DELETE. New index does not have this branch. Remove old snapshot {$oldBranchInfo['snapshot']['path']}\n";
+		} elseif ( $oldBranchInfo['snapshot'] == false || $oldBranchInfo['snapshot']['path'] === $newBranchInfos[$branch]['snapshot']['path'] ) {
+			print "  > OK. Previous version is still up to date.\n";
+			continue;
 		} else {
-			if ( $oldBranchInfo['snapshot'] == false || $oldBranchInfo['snapshot']['path'] === $newBranchInfos[$branch]['snapshot']['path'] ) {
-				print "OK. Previous version is the same.";
-			} else {
-				if ( !file_exists( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] ) ) {
-					print "WARNING. Previous snapshot already deleted.";
-				} else {
-					$del = unlink( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] );
-					if ( $del === false ) {
-						print "ERROR! Could not remove old snapshot at {$oldBranchInfo['snapshot']['path']}";
-					} else {
-						print "UPDATED. Removed previous snapshot at {$oldBranchInfo['snapshot']['path']}";
-					}
-				}
+			print "  > UPDATE. Remove old snapshot {$oldBranchInfo['snapshot']['path']}\n";
+		}
+		if ( !file_exists( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] ) ) {
+			print "  > > WARNING. Old snapshot already deleted.\n";
+		} else {
+			$del = unlink( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] );
+			if ( $del === false ) {
+				print "  > > ERROR! Could not remove old snapshot at {$oldBranchInfo['snapshot']['path']}\n";
 			}
 		}
-		print "\n";
 	}
+	print "\n";
 }
 
 print "\n";

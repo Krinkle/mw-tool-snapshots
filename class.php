@@ -65,9 +65,8 @@ class KrMwSnapshots extends KrToolBaseClass {
 			return false;
 		}
 		$mtime = filemtime( $updateLogFilePath );
-		// If file was changed in the last 5 minutes,
-		// it may still be written to by the updator
-		return $mtime > strtotime( '1 minute ago' );
+		// If file was written to recently, the updator may still be running
+		return $mtime > strtotime( '30 seconds ago' );
 	}
 
 	/**

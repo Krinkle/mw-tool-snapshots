@@ -1,4 +1,7 @@
 cache/*
 local.php
 logs/*
-remotes/*
+
+# Optional, may be different or elsewhere
+public_html/snapshots
+remotes

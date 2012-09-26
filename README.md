@@ -14,4 +14,4 @@ ts-krinkle-mwSnapshots
 * Symlink `{cacheDir}/snapshots` to `./public_html/snapshots`
 * Schedule updateSnaphots.php to run hourly<br>
    `0 * * * * php $HOME/externals/ts-krinkle-mwSnapshots/scripts/updateSnaphots.php > $HOME/externals/ts-krinkle-mwSnapshots/logs/updateSnaphots.log 2>&1`
-* Symlink `./public_html` to `~/public_html/mwSnapshots`
+* Symlink `./public_html` to `/path/to/public_html/mwSnapshots`
