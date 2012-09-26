@@ -4,4 +4,5 @@ logs/*
 
 # Optional, may be different or elsewhere
 public_html/snapshots
+snapshots
 remotes
