@@ -3,6 +3,6 @@ local.php
 logs/*
 
 # Optional, may be different or elsewhere
-public_html/snapshots
+public_html/builds
 snapshots
 remotes
