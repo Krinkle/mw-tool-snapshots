@@ -10,7 +10,7 @@ ts-krinkle-mwSnapshots
   `git clone https://gerrit.wikimedia.org/r/p/mediawiki/core.git mediawiki-core`
 * Run:<br>
   `php scripts/updateSnaphots.php`
-* Symlink `{cacheDir}/snapshots` to `./public_html/snapshots`
+* Symlink `{cacheDir}/snapshots` to `./public_html/builds`
 * Schedule updateSnaphots.php to run hourly<br>
    `0 * * * * php /path/to/mwSnapshots/scripts/updateSnaphots.php > {logsDir}/updateSnaphots.log 2>&1`
 * Symlink `./public_html` to be or to be inside of `/path/to/public_html`

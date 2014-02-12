@@ -10,7 +10,12 @@
 
 class KrMwSnapshots extends KrToolBaseClass {
 
+	protected $settings = array(
+		'buildsPath' => 'builds',
+	);
+
 	protected $settingsKeys = array(
+		'buildsPath',
 		'mediawikiCoreRepoDir',
 		'cacheDir',
 		'logsDir',
@@ -112,8 +117,8 @@ class KrMwSnapshots extends KrToolBaseClass {
 		global $kgBaseTool;
 
 		return rtrim( $kgBaseTool->remoteBasePath, '/' )
-			. '/snapshots/'
-			. $repoName
+			. '/' . $this->settings['buildsPath']
+			. '/' . $repoName
 			. '/' . $branchInfo['snapshot']['path'];
 	}
 
