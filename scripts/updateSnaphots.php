@@ -109,8 +109,6 @@ function kfMwSnapUtil_gitCleanAndReset() {
 
 kfMwSnapUtil_gitCleanAndReset();
 
-print "Fetch updates from remotes...\n";
-kfShellExec( "git fetch --all" );
 
 // Get remotes (in order to check if there are multiple (which we don't support),
 // and so that we can use this name to substract it from the remote branche names.
@@ -124,6 +122,10 @@ if ( count( $remoteRepository )  > 1 ) {
 	exit;
 }
 $remoteRepository = $remoteRepository[0];
+
+print "Fetch updates from remote...\n";
+
+kfShellExec( 'git fetch ' . kfEscapeShellArg( $remoteRepository ) );
 
 
 // Get branches: http://gitready.com/intermediate/2009/02/13/list-remote-branches.html
