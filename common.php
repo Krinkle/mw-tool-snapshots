@@ -11,7 +11,7 @@ $kgTool = new KrMwSnapshots();
 $I18N = new TsIntuition( 'Mwsnapshots' );
 
 $toolConfig = array(
-	'displayTitle' => 'mwSnapshots',
+	'displayTitle' => 'Snapshots',
 	'krinklePrefix' => false,
 	'remoteBasePath' => dirname( $kgConf->getRemoteBase() ). '/',
 	'revisionId' => '0.1.2',
