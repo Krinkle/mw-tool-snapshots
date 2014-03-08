@@ -1,4 +1,4 @@
-ts-krinkle-mwSnapshots
+Snapshots
 ======================
 
 ## Install:
@@ -12,5 +12,5 @@ ts-krinkle-mwSnapshots
   `php scripts/updateSnaphots.php`
 * Symlink `{cacheDir}/snapshots` to `./public_html/builds`
 * Schedule updateSnaphots.php to run hourly<br>
-   `0 * * * * php /path/to/mwSnapshots/scripts/updateSnaphots.php > {logsDir}/updateSnaphots.log 2>&1`
+   `0 * * * * php /path/to/mw-tool-snapshots/scripts/updateSnaphots.php > {logsDir}/updateSnaphots.log 2>&1`
 * Symlink `./public_html` to be or to be inside of `/path/to/public_html`

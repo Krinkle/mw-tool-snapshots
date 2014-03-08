@@ -3,7 +3,7 @@
 		prevRepoBranch, infoAjax,
 		log = window.console && console.log && console.log.bind && console.log.bind(console) || function () {};
 
-	$loader = $('<div class="krinkle-mwSnapshots-ajax-loader"></div>');
+	$loader = $('<div class="krinkle-snapshots-ajax-loader"></div>');
 
 	function showAjaxInfo(repo, branch) {
 
@@ -37,7 +37,7 @@
 					$page = $('<div>').append(ajaxResp.pageHtml);
 					if (ajaxResp.downloadUrl) {
 						$page
-							.find('.krinkle-mwSnapshots-download-badge button')
+							.find('.krinkle-snapshots-download-badge button')
 							.click(function () {
 								window.location.href = ajaxResp.downloadUrl;
 							});
@@ -96,10 +96,10 @@
 
 	$(document).ready(function ($) {
 		var hash;
-		$ajaxTarget = $('#krinkle-mwSnapshots-ajax');
+		$ajaxTarget = $('#krinkle-snapshots-ajax');
 		$pageWrap = $('#page-wrap');
 
-		$branchesSelects = $('.krinkle-mwSnapshots-branches').on('change blur', function () {
+		$branchesSelects = $('.krinkle-snapshots-branches').on('change blur', function () {
 			var $el = $(this);
 			showAjaxInfo($el.data('repoName'), $el.val());
 		});

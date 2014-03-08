@@ -1,14 +1,13 @@
 <?php
 /**
- * class.php: Helper functions
- * Created on May 7, 2012
+ * Helper functions
  *
- * @package ts-krinkle-mwSnapshots
- * @author Timo Tijhof <krinklemail@gmail.com>, 2012
- * @license CC-BY-SA 3.0 Unported: creativecommons.org/licenses/by/3.0/
+ * @package mw-tool-snapshots
+ * @license http://krinkle.mit-license.org/
+ * @author Timo Tijhof, 2012-2014
  */
 
-class KrMwSnapshots extends KrToolBaseClass {
+class KrSnapshots extends KrToolBaseClass {
 
 	protected $settings = array(
 		'buildsPath' => 'builds',

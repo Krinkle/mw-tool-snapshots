@@ -1,11 +1,10 @@
 <?php
 /**
- * index.php: Web front-end
- * Created on May 6, 2012
+ * Web server entry point
  *
- * @package ts-krinkle-mwSnapshots
- * @author Timo Tijhof <krinklemail@gmail.com>, 2012
- * @license CC-BY-SA 3.0 Unported: creativecommons.org/licenses/by/3.0/
+ * @package mw-tool-snapshots
+ * @license http://krinkle.mit-license.org/
+ * @author Timo Tijhof, 2012-2014
  */
 
 /**
@@ -121,7 +120,7 @@ if ( !$snapshotInfo ) {
 			}
 
 			$pageHtml .=
-				'<table class="wikitable krinkle-mwSnapshots-download-box"><tbody>'
+				'<table class="wikitable krinkle-snapshots-download-box"><tbody>'
 				. '<tr><th>'
 				. htmlspecialchars( $I18N->msg( 'tablehead-repo' ) )
 				. '</th><td>'
@@ -179,7 +178,7 @@ if ( !$snapshotInfo ) {
 			. '</tbody></table>';
 
 			if ( $isAjax ) {
-				$pageHtml = '<div class="krinkle-mwSnapshots-download-badge">'
+				$pageHtml = '<div class="krinkle-snapshots-download-badge">'
 				. '<button>&darr;<br/>' . $I18N->msg( 'download-button', array(
 					'variables' => array( $branchName ),
 					'escape' => 'html'
@@ -224,7 +223,7 @@ if ( !$snapshotInfo ) {
 } else {
 	$pageHtml .= Html::element( 'h2', array(), $I18N->msg( 'title-overview' ) );
 
-	$pageHtml .= '<table class="wikitable krinkle-mwSnapshots-repos-box"><thead><tr><th colspan="2">'
+	$pageHtml .= '<table class="wikitable krinkle-snapshots-repos-box"><thead><tr><th colspan="2">'
 		. htmlspecialchars( $I18N->msg( 'tablehead-repo' ) )
 		. '</th><th>'
 		. htmlspecialchars( $I18N->msg( 'tablehead-snapshots' ) )
@@ -246,9 +245,9 @@ if ( !$snapshotInfo ) {
 		$repo = $repoInfos[$repoName];
 		$branchesSelect = Html::openElement( 'select', array(
 			'name' => 'branch',
-			'class' => 'krinkle-mwSnapshots-branches',
+			'class' => 'krinkle-snapshots-branches',
 			'data-repo-name' => $repoName,
-			'id' => 'krinkle-mwSnapshots-branches-' . $repoName,
+			'id' => 'krinkle-snapshots-branches-' . $repoName,
 		));
 		foreach ( $data['branches'] as $branch => $branchInfo ) {
 			$branchesSelect .= Html::element( 'option', array(
@@ -261,7 +260,7 @@ if ( !$snapshotInfo ) {
 		}
 		$branchesSelect .= '</select>';
 		$pageHtml .=
-			'<tr><td class="krinkle-mwSnapshots-repo-logo">'
+			'<tr><td class="krinkle-snapshots-repo-logo">'
 				. ( isset( $repo['img'] )
 					? Html::element( 'img', array(
 						'src' => $repo['img'],
@@ -270,7 +269,7 @@ if ( !$snapshotInfo ) {
 					))
 					: ''
 				)
-			. '</td><td class="krinkle-mwSnapshots-repo-title">'
+			. '</td><td class="krinkle-snapshots-repo-title">'
 				. '<p><strong>'
 				. Html::element( 'a', array(
 						'href' => $repo['site-url'],
@@ -298,7 +297,7 @@ if ( !$snapshotInfo ) {
 				. Html::openElement( 'form', array(
 					'action' => $kgBaseTool->remoteBasePath,
 					'method' => 'post',
-					'class' => 'krinkle-mwSnapshots-repo-select',
+					'class' => 'krinkle-snapshots-repo-select',
 				))
 				. Html::element( 'input', array(
 					'type' => 'hidden',
@@ -311,13 +310,13 @@ if ( !$snapshotInfo ) {
 					'value' => $repoName
 				))
 				. Html::element( 'label', array(
-						'for' => 'krinkle-mwSnapshots-branches-' . $repoName
+						'for' => 'krinkle-snapshots-branches-' . $repoName
 					),
 					$I18N->msg( 'repo-branches-label' )
 				)
 				. '&nbsp;'
 				. $branchesSelect
-				. '<div class="krinkle-mwSnapshots-repo-select-submit">'
+				. '<div class="krinkle-snapshots-repo-select-submit">'
 				. Html::element( 'input', array(
 					'type' => 'submit',
 					'nof' => true,
@@ -325,7 +324,7 @@ if ( !$snapshotInfo ) {
 				))
 				. '</div>'
 				. '</form>'
-				. '<p class="krinkle-mwSnapshots-repo-dumpdate">Last dump: '
+				. '<p class="krinkle-snapshots-repo-dumpdate">Last dump: '
 					. Html::element( 'time', array(
 							'itemprop' => 'published',
 							'datetime' => gmdate( 'Y-m-d\TH:i:s\Z', $data['_updateEnd'] ),
@@ -343,7 +342,7 @@ if ( !$snapshotInfo ) {
 	}
 	}
 	$pageHtml .= '</tbody></table>';
-	$pageHtml .= '<div id="krinkle-mwSnapshots-ajax"></div>';
+	$pageHtml .= '<div id="krinkle-snapshots-ajax"></div>';
 }
 
 $kgBaseTool->addOut( $pageHtml );

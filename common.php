@@ -6,7 +6,7 @@ require_once( KR_TSINT_START_INC );
 
 // Class for this tool
 require_once( __DIR__ . '/class.php' );
-$kgTool = new KrMwSnapshots();
+$kgTool = new KrSnapshots();
 
 $I18N = new TsIntuition( 'Mwsnapshots' );
 
@@ -27,4 +27,4 @@ $toolConfig = array(
 require_once( __DIR__ . '/local.php' );
 
 $kgBaseTool = BaseTool::newFromArray( $toolConfig );
-$kgBaseTool->setSourceInfoGithub( 'Krinkle', 'ts-krinkle-mwSnapshots', __DIR__ );
+$kgBaseTool->setSourceInfoGithub( 'Krinkle', 'mw-tool-snapshots', __DIR__ );

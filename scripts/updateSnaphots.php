@@ -1,11 +1,10 @@
 <?php
 /**
- * updateSnaphots.php: Maintenance script to be ran from the command-line
- * Created on May 7, 2012
+ * Script to generate snapshots (run from the command-line)
  *
- * @package ts-krinkle-mwSnapshots
- * @author Timo Tijhof <krinklemail@gmail.com>, 2012
- * @license CC-BY-SA 3.0 Unported: creativecommons.org/licenses/by/3.0/
+ * @package mw-tool-snapshots
+ * @license http://krinkle.mit-license.org/
+ * @author Timo Tijhof, 2012-2014
  */
 require_once( __DIR__ . '/../common.php' );
 
@@ -58,11 +57,11 @@ chdir( $kgTool->getSetting( 'mediawikiCoreRepoDir' ) );
  * @param string $input
  * @return array
  */
-function kfMwSnapUtil_trimSplitCleanLines( $input ) {
+function kfSnapshotsUtil_trimSplitCleanLines( $input ) {
 	return array_map( 'trim', explode( "\n", trim( $input ) ) );
 }
 
-function kfMwSnapUtil_isGoodBranch( $input ) {
+function kfSnapshotsUtil_isGoodBranch( $input ) {
 	if (
 		// Skip stuff like "HEAD -> origin/master"
 		strpos( $input, '->' ) === false
@@ -83,11 +82,11 @@ function kfMwSnapUtil_isGoodBranch( $input ) {
 }
 
 /** @return string: filtered string */
-function kfMwSnapUtil_archiveNameSnippetFilter( $input ) {
+function kfSnapshotsUtil_archiveNameSnippetFilter( $input ) {
 	return str_replace( array( '/', '\\', '-', '.', ' ' ), '_', $input );
 }
 
-function kfMwSnapUtil_gitCleanAndReset() {
+function kfSnapshotsUtil_gitCleanAndReset() {
 	// When checking out a whole bunch of remote branches, creating
 	// archives, moving stuff around. The working copy sometimes leaves
 	// files behind from old mediawiki versions that fall under gitignore
@@ -107,7 +106,7 @@ function kfMwSnapUtil_gitCleanAndReset() {
  * -------------------------------------------------
  */
 
-kfMwSnapUtil_gitCleanAndReset();
+kfSnapshotsUtil_gitCleanAndReset();
 
 
 // Get remotes (in order to check if there are multiple (which we don't support),
@@ -116,7 +115,7 @@ kfMwSnapUtil_gitCleanAndReset();
 // So we can remove the "gerrit/" preifx from "gerrit/REL1_19", "gerrit/master" etc.
 print "Getting names of remotes...\n";
 $remoteRepository = kfShellExec( "git remote" );
-$remoteRepository = kfMwSnapUtil_trimSplitCleanLines( $remoteRepository );
+$remoteRepository = kfSnapshotsUtil_trimSplitCleanLines( $remoteRepository );
 if ( count( $remoteRepository )  > 1 ) {
 	print "Fatal: This tool does not support working with branches from multiple remotes\n";
 	exit;
@@ -131,7 +130,7 @@ kfShellExec( 'git fetch ' . kfEscapeShellArg( $remoteRepository ) );
 // Get branches: http://gitready.com/intermediate/2009/02/13/list-remote-branches.html
 print "Getting list of remote branches...\n";
 $remoteBranchNames = kfShellExec( "git branch -r --color='never'" );
-$remoteBranchNames = kfMwSnapUtil_trimSplitCleanLines( $remoteBranchNames );
+$remoteBranchNames = kfSnapshotsUtil_trimSplitCleanLines( $remoteBranchNames );
 natsort( $remoteBranchNames );
 print "Remote branches: \n\t" . implode( "\n\t", $remoteBranchNames ) . "\n";
 
@@ -145,7 +144,7 @@ print "Remote branches: \n\t" . implode( "\n\t", $remoteBranchNames ) . "\n";
 foreach ( $remoteBranchNames as $remoteBranchName ) {
 
 	print "\n== Remote: {$remoteBranchName} ==\n\n";
-	if ( !kfMwSnapUtil_isGoodBranch( $remoteBranchName ) ) {
+	if ( !kfSnapshotsUtil_isGoodBranch( $remoteBranchName ) ) {
 		print "..skipping, not a good branch name.\n";
 		continue;
 	}
@@ -168,9 +167,9 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	print "* Branch head: $branchHead\n";
 
 	$archiveFileName = 'mediawiki-snapshot-'
-		. kfMwSnapUtil_archiveNameSnippetFilter( $branchName )
+		. kfSnapshotsUtil_archiveNameSnippetFilter( $branchName )
 		. '-'
-		. kfMwSnapUtil_archiveNameSnippetFilter( substr( $branchHead, 0, 7 ) )
+		. kfSnapshotsUtil_archiveNameSnippetFilter( substr( $branchHead, 0, 7 ) )
 		. '.tar.gz';
 	$archiveFilePath = "$archiveDir/$archiveFileName";
 
@@ -305,7 +304,7 @@ print "\n";
 
 // Clean up afterwards as well,
 // leaving behind a fresh master
-kfMwSnapUtil_gitCleanAndReset();
+kfSnapshotsUtil_gitCleanAndReset();
 
 print "
 --
