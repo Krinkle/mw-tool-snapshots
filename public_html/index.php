@@ -21,9 +21,9 @@ $repoInfos = array(
 		'display-title' => 'MediaWiki core',
 		'img' => '//upload.wikimedia.org/wikipedia/mediawiki/b/bc/Wiki.png',
 		'site-url' => '//www.mediawiki.org/',
-		'repo-browse-url' => 'https://gerrit.wikimedia.org/r/gitweb?p=mediawiki/core.git;a=tree',
-		'repo-branch-url' => 'https://gerrit.wikimedia.org/r/gitweb?p=mediawiki/core.git;a=shortlog;h=refs/heads/$1',
-		'repo-commit-url' => 'https://gerrit.wikimedia.org/r/gitweb?p=mediawiki/core.git;a=commit;h=$1',
+		'repo-browse-url' => 'https://github.com/wikimedia/mediawiki-core',
+		'repo-branch-url' => 'https://github.com/wikimedia/mediawiki-core/tree/$1',
+		'repo-commit-url' => 'https://github.com/wikimedia/mediawiki-core/commit/$1',
 	),
 );
 
