@@ -196,8 +196,7 @@ if ( !$snapshotInfo ) {
 			} else {
 				$pageHtml .= '<script>'
 				. 'setTimeout(function () {'
-				. 'var downloadUrl = ' . json_encode( $downloadUrl ) . ';'
-				. 'window.location.href = downloadUrl;'
+				. 'location.href = ' . json_encode( $downloadUrl ) . ';'
 				. '}, 1000);'
 				. '</script>';
 			}
