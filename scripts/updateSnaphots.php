@@ -87,16 +87,8 @@ function kfSnapshotsUtil_archiveNameSnippetFilter( $input ) {
 }
 
 function kfSnapshotsUtil_gitCleanAndReset() {
-	// When checking out a whole bunch of remote branches, creating
-	// archives, moving stuff around. The working copy sometimes leaves
-	// files behind from old mediawiki versions that fall under gitignore
-	// and other crap. Beware that if you run this locally, dont use your
-	// main "dev wiki" repo dir for this, because it'll nuke stuff like
-	// LocalSettings.php away as well.
-	print "Forced clean up and reset...\n";
-	print kfGitCleanReset( array(
-		'unlock' => true,
-	) );
+	print "Clean worktree...\n";
+	print kfGitCleanReset( array( 'unlock' => true ) );
 	print "\n";
 }
 
@@ -124,6 +116,7 @@ $remoteRepository = $remoteRepository[0];
 print "Fetch updates from remote...\n";
 
 kfShellExec( 'git fetch ' . kfEscapeShellArg( $remoteRepository ) );
+kfShellExec( 'git fetch --prune' );
 
 
 // Get branches: http://gitready.com/intermediate/2009/02/13/list-remote-branches.html
@@ -178,10 +171,14 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 		continue;
 	}
 
-	print "Checking out $remoteBranchName...\n";
-	// We're checking out a remote branch head, which means we'll go into a headless (no branch)
-	// state, surpress the informative mesage with -q.
-	$execOut = kfShellExec( 'git checkout ' . kfEscapeShellArg( $remoteBranchName ) . ' -q' );
+	// When checking out a whole bunch of remote branches, creating
+	// archives, moving stuff around. The working copy will leave build artificants
+	// behind. It will also contain lots of files that will be considered "untracked"
+	// according to a different branch pointer.
+	// Beware that if you run this locally, don't use your main wiki as this also
+	// removes things like "LocalSettings.php".
+	print "Clean workspace and checkout $remoteBranchName...\n";
+	$execOut = kfGitCleanReset( array( 'checkout' => $remoteBranchName ) );
 
 	// Get revision of this branch. Used so we can check that the checkout worked
 	// (in the past the script failed once due to a .git/index.lock error, in which case
