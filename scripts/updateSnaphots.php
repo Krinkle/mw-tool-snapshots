@@ -297,9 +297,9 @@ if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
 
 print "\n";
 
-// Clean up afterwards as well, leaving behind a fresh checkout
+// Clean up afterwards as well, leaving behind a fresh master
 print "Clean worktree...\n";
-print kfGitCleanReset( array( 'unlock' => true , 'checkout' => "{$remoteRepository}/HEAD" ) );
+print kfGitCleanReset( array( 'unlock' => true , 'checkout' => "{$remoteRepository}/master" ) );
 
 print "
 --
