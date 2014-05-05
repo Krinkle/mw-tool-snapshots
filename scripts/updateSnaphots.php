@@ -134,7 +134,7 @@ print "Remote branches: \n\t" . implode( "\n\t", $remoteBranchNames ) . "\n";
  */
 foreach ( $remoteBranchNames as $remoteBranchName ) {
 
-	print "\n== Remote: {$remoteBranchName} ==\n\n";
+	print "\n== Branch: {$remoteBranchName} ==\n\n";
 	if ( !kfSnapshotsUtil_isGoodBranch( $remoteBranchName ) ) {
 		print "..skipping, not a good branch name.\n";
 		continue;
@@ -164,11 +164,12 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 		. '.tar.gz';
 	$archiveFilePath = "$archiveDir/$archiveFileName";
 
-	print "Preparing to create archive at $archiveFilePath\n";
+	print "* Target file name: $archiveFileName\n";
 	if ( file_exists( $archiveFilePath ) ) {
-		print "> A snapshot of this exact version already exists, no update needed.\n";
+		print "> Already in cache, no update needed.\n";
 		continue;
 	}
+	print "Preparing to create archive...";
 
 	// When checking out a whole bunch of remote branches, creating
 	// archives, moving stuff around. The working copy will leave build artificants
@@ -193,7 +194,8 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 	}
 
 	if ( $branchHead !== $currHead ) {
-		print "> ERROR: Current HEAD does not match remote branch head. Checkout likely failed. Skipping $remoteBranchName...\n";
+		// Checkout likely failed
+		print "> ERROR: Current HEAD does not match remote branch pointer. Skipping...\n";
 		continue;
 	}
 
@@ -217,14 +219,14 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 		$masterSymlinkPath = "$archiveDir/$masterSymlinkName";
 		if ( file_exists( $masterSymlinkPath ) ) {
 			if ( !unlink( $masterSymlinkPath ) ) {
-				print "> Error: Could not remove old one";
+				print "> ERROR: Could not remove old symlink";
 			}
 		}
-		if ( link( /* target= */ $archiveFilePath, /* link = */ $masterSymlinkPath ) ) {
+		if ( link( /* target = */ $archiveFilePath, /* link = */ $masterSymlinkPath ) ) {
 			print "> Done\n";
 		} else {
-				print "> Error: Could not create new symlink\n";
-			}
+			print "> ERROR: Failed to create symlink\n";
+		}
 	}
 
 	$snapshotInfo['mediawiki-core']['branches'][$branchName] = array(
@@ -276,22 +278,23 @@ if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
 	foreach ( $oldBranchInfos as $branch => $oldBranchInfo ) {
 		print "* $branch:\n";
 		if ( !isset( $newBranchInfos[$branch] ) || $newBranchInfos[$branch]['snapshot'] == false ) {
-			print "  > DELETE. New index does not have this branch. Remove old snapshot {$oldBranchInfo['snapshot']['path']}\n";
+			print "  > DELETE. New index does not have this branch. Removing old snapshot {$oldBranchInfo['snapshot']['path']}\n";
 		} elseif ( $oldBranchInfo['snapshot'] == false || $oldBranchInfo['snapshot']['path'] === $newBranchInfos[$branch]['snapshot']['path'] ) {
-			print "  > OK. Previous version is still up to date.\n";
+			// New branch or old version was the same. Nothing to remove.
 			continue;
 		} else {
 			print "  > UPDATE. Remove old snapshot {$oldBranchInfo['snapshot']['path']}\n";
 		}
 		if ( !file_exists( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] ) ) {
-			print "  > > WARNING. Old snapshot already deleted.\n";
+			print "  > > WARNING. Old snapshot was already deleted.\n";
 		} else {
 			$del = unlink( $archiveDir . '/' . $oldBranchInfo['snapshot']['path'] );
 			if ( $del === false ) {
-				print "  > > ERROR! Could not remove old snapshot at {$oldBranchInfo['snapshot']['path']}\n";
+				print "  > > ERROR! Failed to delete {$oldBranchInfo['snapshot']['path']}\n";
 			}
 		}
 	}
+
 	print "\n";
 }
 
