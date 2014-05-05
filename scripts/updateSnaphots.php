@@ -86,18 +86,13 @@ function kfSnapshotsUtil_archiveNameSnippetFilter( $input ) {
 	return str_replace( array( '/', '\\', '-', '.', ' ' ), '_', $input );
 }
 
-function kfSnapshotsUtil_gitCleanAndReset() {
-	print "Clean worktree...\n";
-	print kfGitCleanReset( array( 'unlock' => true ) );
-	print "\n";
-}
-
 /**
  * Update
  * -------------------------------------------------
  */
 
-kfSnapshotsUtil_gitCleanAndReset();
+print "Clean worktree...\n";
+print kfGitCleanReset( array( 'unlock' => true ) );
 
 
 // Get remotes (in order to check if there are multiple (which we don't support),
@@ -105,13 +100,17 @@ kfSnapshotsUtil_gitCleanAndReset();
 // e.g. this will probably return "origin" or "gerit".
 // So we can remove the "gerrit/" preifx from "gerrit/REL1_19", "gerrit/master" etc.
 print "Getting names of remotes...\n";
-$remoteRepository = kfShellExec( "git remote" );
-$remoteRepository = kfSnapshotsUtil_trimSplitCleanLines( $remoteRepository );
-if ( count( $remoteRepository )  > 1 ) {
-	print "Fatal: This tool does not support working with branches from multiple remotes\n";
+$remoteRepository = 'origin';
+$remoteRepositories = kfSnapshotsUtil_trimSplitCleanLines( kfShellExec( "git remote" ) );
+if ( !in_array( $remoteRepository, $remoteRepositories ) && count( $remoteRepositories ) > 1 ) {
+	print "Fatal: This tool requires there be a remote called '{$remoteRepository}'.\n";
 	exit;
 }
-$remoteRepository = $remoteRepository[0];
+if ( count( $remoteRepositories ) > 1 ) {
+	// Because of "git branch -r"
+	print "Fatal: This tool does not support multiple remotes..\n";
+	exit;
+}
 
 print "Fetch updates from remote...\n";
 
@@ -298,9 +297,9 @@ if ( !isset( $oldSnapshotInfo['mediawiki-core']['branches'] ) ) {
 
 print "\n";
 
-// Clean up afterwards as well,
-// leaving behind a fresh master
-kfSnapshotsUtil_gitCleanAndReset();
+// Clean up afterwards as well, leaving behind a fresh checkout
+print "Clean worktree...\n";
+print kfGitCleanReset( array( 'unlock' => true , 'checkout' => "{$remoteRepository}/HEAD" ) );
 
 print "
 --
