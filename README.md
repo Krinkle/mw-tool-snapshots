@@ -6,7 +6,7 @@
   needs to be able to write, read and remove files from these directories.
   In the case of `cacheDir`, it needs to be able to create directories as well.
 * Make sure the path of `mediawikiCoreRepoDir` points to a mediawiki core checkout:<br>
-  `git clone https://git.wikimedia.org/git/mediawiki/core.git mediawiki-core`
+  `git clone https://gerrit.wikimedia.org/r/p/mediawiki/core.git mediawiki-core`
 * Run:<br>
   `php scripts/updateSnaphots.php`
 * Symlink `{cacheDir}/snapshots` to `./public_html/builds`

@@ -95,7 +95,6 @@ function kfSnapshotsUtil_gitCleanAndReset() {
 	// LocalSettings.php away as well.
 	print "Forced clean up and reset...\n";
 	print kfGitCleanReset( array(
-		'checkout' => 'master',
 		'unlock' => true,
 	) );
 	print "\n";
