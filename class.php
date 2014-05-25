@@ -2,9 +2,9 @@
 /**
  * Helper functions
  *
- * @package mw-tool-snapshots
- * @license http://krinkle.mit-license.org/
  * @author Timo Tijhof, 2012-2014
+ * @license http://krinkle.mit-license.org/
+ * @package mw-tool-snapshots
  */
 
 class KrSnapshots extends KrToolBaseClass {
@@ -134,5 +134,19 @@ class KrSnapshots extends KrToolBaseClass {
 			}
 		}
 		return false;
+	}
+
+	public static function getPanelHtml( $type, $content ) {
+		global $I18N;
+		return Html::rawElement(
+			'div',
+			array(
+				'class' => 'panel panel-' . $type,
+			),
+			'<div class="panel-heading">'
+			. Html::element( 'h3', array( 'class' => 'panel-title' ), $I18N->msg( 'title-error' ) )
+			. '</div>'
+			. '<div class="panel-body">' . $content . '</div>'
+		);
 	}
 }

@@ -3,7 +3,7 @@
 		prevRepoBranch, infoAjax,
 		log = window.console && console.log && console.log.bind && console.log.bind(console) || function () {};
 
-	$loader = $('<div class="krinkle-snapshots-ajax-loader"></div>');
+	$loader = $('<div class="snapshots-ajax-loader"></div>');
 
 	function showAjaxInfo(repo, branch) {
 
@@ -34,18 +34,10 @@
 				ajaxResp = argsAjax[0];
 
 				if (ajaxResp.pageHtml) {
-					$page = $('<div>').append(ajaxResp.pageHtml);
-					if (ajaxResp.downloadUrl) {
-						$page
-							.find('.krinkle-snapshots-download-badge button')
-							.click(function () {
-								window.location.href = ajaxResp.downloadUrl;
-							});
-					}
-					$ajaxTarget.empty().append($page);
+					$ajaxTarget.empty().append(ajaxResp.pageHtml);
 
 				} else {
-					$ajaxTarget.html('<div class="basetool-msg warning">Error retreiving data from server...</div>');
+					$ajaxTarget.html('<div class="alert alert-danger">Unable to retreive data...</div>');
 				}
 				$ajaxTarget.fadeIn();
 			})
@@ -96,10 +88,10 @@
 
 	$(document).ready(function ($) {
 		var hash;
-		$ajaxTarget = $('#krinkle-snapshots-ajax');
+		$ajaxTarget = $('#snapshots-ajax');
 		$pageWrap = $('#page-wrap');
 
-		$branchesSelects = $('.krinkle-snapshots-branches').on('change blur', function () {
+		$branchesSelects = $('.snapshots-branches').on('change blur', function () {
 			var $el = $(this);
 			showAjaxInfo($el.data('repoName'), $el.val());
 		});

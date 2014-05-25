@@ -1,35 +1,17 @@
-.krinkle-snapshots-repos-box {
-	width: 100%;
-}
-
-.krinkle-snapshots-repos-box td.krinkle-snapshots-repo-logo {
+.snapshots-repos-box td.snapshots-repo-logo {
 	width: 150px;
 	border-right: none;
 }
 
-.krinkle-snapshots-repos-box td.krinkle-snapshots-repo-title {
+.snapshots-repos-box td.snapshots-repo-title {
 	border-left: none;
 }
 
-.krinkle-snapshots-repo-select {
-	text-align: center;
-	margin-bottom: 2em;
-}
-
-.krinkle-snapshots-repo-select-submit {
-	margin: 2em 0;
-}
-
-.krinkle-snapshots-repo-select-submit input[type="submit"] {
-	padding: 7px 10px;
-	font-size: larger;
-}
-
-.JS .krinkle-snapshots-repo-select-submit {
+.client-js .snapshots-repo-select-submit {
 	display: none;
 }
 
-.krinkle-snapshots-ajax-loader {
+.snapshots-ajax-loader {
 	display: block;
 	margin: 0 auto;
 	padding: 21px 0 56px 0;
@@ -38,25 +20,6 @@
 	background: transparent url(loader-48.gif) no-repeat 50% 50%;
 }
 
-.krinkle-snapshots-repo-dumpdate {
-	font-size: smaller;
-	text-align: right;
-}
-
-.krinkle-snapshots-download-box {
-	margin-top: 2em;
-}
-
-.krinkle-snapshots-download-badge {
-	float: right;
-	margin: 2em 7em 0 1em;
-	text-align: center;
-	line-height: 2;
-}
-
-.krinkle-snapshots-download-badge button {
-	padding: 5px 10px;
-	font-weight: bold;
-	font-size: larger;
-	text-align: center;
+.snapshots-download-badge {
+	margin: 2em 0;
 }
