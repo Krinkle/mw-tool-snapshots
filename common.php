@@ -16,7 +16,7 @@ $I18N = new TsIntuition( 'mwsnapshots' );
 $toolConfig = array(
 	'displayTitle' => $I18N->msg( 'title-overview' ),
 	'remoteBasePath' => dirname( $kgConf->getRemoteBase() ). '/',
-	'revisionId' => '0.1.2',
+	'revisionId' => '0.2.0',
 	'styles' => array(
 		'main.css',
 	),
