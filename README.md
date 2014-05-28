@@ -1,4 +1,5 @@
-# Snapshots [![Build Status](https://travis-ci.org/Krinkle/mw-tool-snapshots.png?branch=master)](https://travis-ci.org/Krinkle/mw-tool-snapshots)
+[![Build Status](https://travis-ci.org/Krinkle/mw-tool-snapshots.svg?branch=master)](https://travis-ci.org/Krinkle/mw-tool-snapshots)
+# Snapshots
 
 ## Install:
 * Copy `local.php-sample` and rename to `local.php`
