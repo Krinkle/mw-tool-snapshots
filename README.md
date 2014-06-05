@@ -2,7 +2,7 @@
 # Snapshots
 
 ## Install:
-* Copy `local.php-sample` and rename to `local.php`
+* Copy `sample-local.php` and rename to `local.php`
 * Fill in paths for the needed directories (and create them if needed). Keep in mind that the PHP script
   needs to be able to write, read and remove files from these directories.
   In the case of `cacheDir`, it needs to be able to create directories as well.
