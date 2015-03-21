@@ -83,7 +83,7 @@
 	}
 
 	function hashSet(repo, branch) {
-		window.location.hash = '#!/' + repo + '/' + branch;
+		location.hash = '#!/' + repo + '/' + branch;
 	}
 
 	$(document).ready(function ($) {
