@@ -71,7 +71,6 @@ function kfSnapshotsUtil_isGoodBranch( $input ) {
 
 			// Only keep master, REL* and wmf*
 			&& ( strpos( $input, '/REL' ) !== false
-				|| strpos( $input, '/wmf' ) !== false
 				|| strpos( $input, '/master' ) !== false
 			)
 	) {
