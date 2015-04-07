@@ -1,3 +1,3 @@
-[submodule "lib/basetool"]
-	path = lib/basetool
+[submodule "lib/toollabs-base"]
+	path = lib/toollabs-base
 	url = https://github.com/Krinkle/toollabs-base.git
