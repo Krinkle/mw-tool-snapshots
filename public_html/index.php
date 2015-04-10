@@ -181,10 +181,7 @@ if ( !$snapshotInfo ) {
 					'class' => 'btn btn-primary btn-lg',
 					'href' => $downloadUrl,
 				), '<span class="glyphicon glyphicon-download-alt"></span> '
-				. $I18N->msg( 'download-button', array(
-					'variables' => array( $branchName ),
-					'escape' => 'html',
-				) )
+				. $I18N->msg( 'download-button', array( 'escape' => 'html' ) )
 			);
 
 			if ( !$isAjax ) {
