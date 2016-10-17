@@ -1,7 +1,7 @@
 <?php
 
 // BaseTool & Localization
-require_once __DIR__ . '/lib/basetool/InitTool.php';
+require_once __DIR__ . '/lib/toollabs-base/InitTool.php';
 require_once KR_TSINT_START_INC;
 
 // Class for this tool
