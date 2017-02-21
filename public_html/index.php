@@ -72,7 +72,7 @@ if ( !$snapshotInfo ) {
 
 	$repoName = $kgReq->getVal( 'repo' );
 	$branchName = $kgReq->getVal( 'branch' );
-	$isAjax = $kgReq->getBool( 'ajax' );
+	$isAjax = $kgReq->hasKey( 'ajax' );
 	$downloadUrl = null;
 
 	if ( !isset( $repoInfos[$repoName] ) || !isset( $snapshotInfo[$repoName] ) ) {
