@@ -1,0 +1,12 @@
+{
+	"require": {
+		"Krinkle/toollabs-base": "^0.8.0",
+		"krinkle/intuition": "^0.4.0"
+	},
+	"require-dev": {
+		"jakub-onderka/php-parallel-lint": "^0.9.2"
+	},
+	"scripts": {
+		"test": "parallel-lint --exclude vendor ."
+	}
+}

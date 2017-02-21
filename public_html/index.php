@@ -2,15 +2,11 @@
 /**
  * Web server entry point
  *
- * @author Timo Tijhof, 2012-2014
- * @license http://krinkle.mit-license.org/
+ * @author Timo Tijhof
+ * @license https://krinkle.mit-license.org/
  * @package mw-tool-snapshots
  */
 
-/**
- * Configuration
- * -------------------------------------------------
- */
 require_once __DIR__ . '/../common.php';
 
 $repoInfos = array(
@@ -26,7 +22,7 @@ $repoInfos = array(
 
 $snapshotInfo = $kgTool->getInfoCache();
 
-$kgBaseTool->addOut( '<div class="container">' );
+$kgBase->addOut( '<div class="container">' );
 $pageHtml = '';
 
 /**
@@ -42,8 +38,8 @@ if ( !$snapshotInfo ) {
  */
 } elseif ( $kgReq->getVal( 'action' ) === 'updatelog' ) {
 
-	$kgBaseTool->setHeadTitle( $I18N->msg( 'title-updatelog' ) );
-	$kgBaseTool->setLayout( 'header', array(
+	$kgBase->setHeadTitle( $I18N->msg( 'title-updatelog' ) );
+	$kgBase->setLayout( 'header', array(
 		'titleText' => $I18N->msg( 'title-updatelog' )
 	) );
 
@@ -71,8 +67,8 @@ if ( !$snapshotInfo ) {
 } elseif (  $kgReq->wasPosted() && $kgReq->getVal( 'action' ) === 'getSnapshot' ) {
 
 	$title = $I18N->msg( 'title-downloadpage' );
-	$kgBaseTool->setHeadTitle( $title );
-	$kgBaseTool->setLayout( 'header', array( 'titleText' => $title ) );
+	$kgBase->setHeadTitle( $title );
+	$kgBase->setLayout( 'header', array( 'titleText' => $title ) );
 
 	$repoName = $kgReq->getVal( 'repo' );
 	$branchName = $kgReq->getVal( 'branch' );
@@ -81,7 +77,7 @@ if ( !$snapshotInfo ) {
 
 	if ( !isset( $repoInfos[$repoName] ) || !isset( $snapshotInfo[$repoName] ) ) {
 		// Error: Invalid repo
-		$pageHtml .= KrSnapshots::getPanelHtml( 'warning', $I18N->msg( 'err-invalid-repo', array(
+		$pageHtml .= MwSnapshots::getPanelHtml( 'warning', $I18N->msg( 'err-invalid-repo', array(
 			'variables' => array( $repoName )
 		) ) );
 	} else {
@@ -90,13 +86,13 @@ if ( !$snapshotInfo ) {
 
 		// Error: Invalid branch
 		if ( !isset( $data['branches'][$branchName] ) ) {
-		$pageHtml .= KrSnapshots::getPanelHtml( 'warning', $I18N->msg( 'err-invalid-branch', array(
+		$pageHtml .= MwSnapshots::getPanelHtml( 'warning', $I18N->msg( 'err-invalid-branch', array(
 			'variables' => array( $branchName, $repoName )
 		) ) );
 
 		// Error: Snapshot unavaiable
 		} elseif ( $data['branches'][$branchName]['snapshot'] == false ) {
-			$pageHtml .= KrSnapshots::getPanelHtml( 'warning', $I18N->msg( 'err-nosnapshot', array(
+			$pageHtml .= MwSnapshots::getPanelHtml( 'warning', $I18N->msg( 'err-nosnapshot', array(
 				'variables' => array( $branchName )
 			) ) );
 
@@ -108,8 +104,8 @@ if ( !$snapshotInfo ) {
 			$title = $I18N->msg( 'title-downloadpage-repo', array(
 				'variables' => array( $repoInfo['display-title'] )
 			) );
-			$kgBaseTool->setHeadTitle( $title );
-			$kgBaseTool->setLayout( 'header', array( 'titleText' => $title ) );
+			$kgBase->setHeadTitle( $title );
+			$kgBase->setLayout( 'header', array( 'titleText' => $title ) );
 
 			if ( $isAjax ) {
 				$pageHtml .= Html::element( 'h2', array(), $title );
@@ -216,7 +212,7 @@ if ( !$snapshotInfo ) {
  */
 } else {
 
-	$kgBaseTool->setLayout( 'header', array(
+	$kgBase->setLayout( 'header', array(
 		'titleText' => $I18N->msg( 'title-overview' )
 	) );
 
@@ -230,7 +226,7 @@ if ( !$snapshotInfo ) {
 	if ( $kgTool->getUpdateLogFilePath() ) {
 		$updatelogLink = ' ' . $I18N->parensWrap(
 			Html::element( 'a', array(
-					'href' => $kgBaseTool->remoteBasePath . '?action=updatelog',
+					'href' => $kgBase->remoteBasePath . '?action=updatelog',
 				),
 				$I18N->msg( 'updatelog-link' )
 			)
@@ -292,7 +288,7 @@ if ( !$snapshotInfo ) {
 				. '</ul>'
 			. '</td><td>'
 				. Html::openElement( 'form', array(
-					'action' => $kgBaseTool->remoteBasePath,
+					'action' => $kgBase->remoteBasePath,
 					'method' => 'post',
 					'class' => 'form-horizontal',
 				))
@@ -348,13 +344,13 @@ if ( !$snapshotInfo ) {
 	$pageHtml .= '<div id="snapshots-ajax"></div>';
 }
 
-$kgBaseTool->addOut( $pageHtml );
+$kgBase->addOut( $pageHtml );
 
 // Close container
-$kgBaseTool->addOut( '</div>' );
+$kgBase->addOut( '</div>' );
 
 /**
  * Close up
  * -------------------------------------------------
  */
-$kgBaseTool->flushMainOutput();
+$kgBase->flushMainOutput();

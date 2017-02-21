@@ -2,10 +2,11 @@
 /**
  * Script to generate snapshots (run from the command-line)
  *
- * @author Timo Tijhof, 2012-2014
- * @license http://krinkle.mit-license.org/
+ * @author Timo Tijhof
+ * @license https://krinkle.mit-license.org/
  * @package mw-tool-snapshots
  */
+
 require_once __DIR__ . '/../common.php';
 
 $snapshotInfo = array();

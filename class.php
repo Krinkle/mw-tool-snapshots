@@ -2,12 +2,12 @@
 /**
  * Helper functions
  *
- * @author Timo Tijhof, 2012-2014
- * @license http://krinkle.mit-license.org/
+ * @author Timo Tijhof
+ * @license https://krinkle.mit-license.org/
  * @package mw-tool-snapshots
  */
 
-class KrSnapshots extends KrToolBaseClass {
+class MwSnapshots extends KrToolBaseClass {
 
 	protected $settings = array(
 		'buildsPath' => 'builds',
@@ -113,9 +113,9 @@ class KrSnapshots extends KrToolBaseClass {
 	}
 
 	public function getDownloadUrl( $repoName, $branchInfo ) {
-		global $kgBaseTool;
+		global $kgBase;
 
-		return rtrim( $kgBaseTool->remoteBasePath, '/' )
+		return rtrim( $kgBase->remoteBasePath, '/' )
 			. '/' . $this->settings['buildsPath']
 			. '/' . $repoName
 			. '/' . $branchInfo['snapshot']['path'];

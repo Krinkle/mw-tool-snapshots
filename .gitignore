@@ -1,8 +1,12 @@
-cache/*
-local.php
-logs/*
+# Set up
+/config.php
+/public_html/builds
 
-# Optional, may be different or elsewhere
-public_html/builds
-snapshots
-remotes
+# Install
+/composer.lock
+/vendor
+
+# Set up (optional) - may be elsewhere
+/cache
+/logs
+/remotes
