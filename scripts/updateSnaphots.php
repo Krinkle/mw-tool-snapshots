@@ -166,8 +166,17 @@ foreach ( $remoteBranchNames as $remoteBranchName ) {
 
 	print "* Target file name: $archiveFileName\n";
 	if ( file_exists( $archiveFilePath ) ) {
-		print "> Already in cache, no update needed.\n";
-		continue;
+		if ( $oldBranchInfo ) {
+			print "> Already in cache, no update needed.\n";
+			continue;
+		} else {
+			// This can happen if cache/snapshotInfo.json gets corrupted
+			// or deleted, while the archive file remains. In that case
+			// we need to re-do most of the archiving (such as checkout
+			// out the whole branch and getting the author and timestamp
+			// metadata). At that point, might as well re-create it.
+			print "> Already in cache, but meta data is missing.\n";
+		}
 	}
 	print "Preparing to create archive...";
 
